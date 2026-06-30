@@ -1,0 +1,1 @@
+今天我掌握了：1，如何用VScode进行编程并运行，2，管理自己的文件，3，学会通过路径打开文件，4建立通过wsschool来系统学习python的流程，5，学习了[]、:、upper()、lower()、split()、strip()、f{}、：.2f   的用法。6，搞定了GitHub账号
