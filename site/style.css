@@ -1,0 +1,354 @@
+/* ========================================
+   ai30.site — W3Schools风格教学网站
+   Phase 1 (Day 1-5): AI全景 + Python提速
+   ======================================== */
+
+:root {
+  --sidebar-w: 260px;
+  --green: #04AA6D;
+  --green-dark: #059862;
+  --green-light: #d4edda;
+  --sidebar-bg: #282A35;
+  --sidebar-item-hover: #1e2029;
+  --sidebar-active: #04AA6D;
+  --code-bg: #1e1e1e;
+  --text: #2d2d2d;
+  --text-light: #666;
+  --bg: #fff;
+  --bg-light: #f8f9fa;
+  --border: #e0e0e0;
+  --answer-bg: #d4edda;
+  --answer-border: #28a745;
+  --warning-bg: #fff3cd;
+  --warning-border: #ffc107;
+  --red: #dc3545;
+  --blue: #0d6efd;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  display: flex;
+  min-height: 100vh;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  color: #fff;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+  font-size: 14px;
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+.sidebar-header {
+  padding: 18px 20px;
+  font-size: 1.15em;
+  font-weight: 700;
+  background: var(--green);
+  position: sticky; top: 0; z-index: 2;
+}
+.sidebar-header a { color: #fff; text-decoration: none; display: block; }
+.sidebar-header small { font-weight: 400; opacity: 0.85; font-size: 0.75em; }
+
+.sidebar-nav { padding: 8px 0 40px; }
+
+.nav-section {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 4px 0;
+}
+
+.nav-section-title {
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: default;
+  user-select: none;
+}
+.nav-section-title.ready { color: var(--green); }
+
+.nav-item {
+  display: block;
+  padding: 8px 20px 8px 28px;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--sidebar-item-hover); color: #fff; }
+.nav-item.active {
+  background: var(--sidebar-item-hover);
+  color: #fff;
+  border-left-color: var(--green);
+  font-weight: 500;
+}
+.nav-item.locked {
+  color: rgba(255,255,255,0.3);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.nav-item .badge {
+  float: right;
+  font-size: 0.7em;
+  background: var(--green);
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-top: 2px;
+}
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Top Bar */
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar .progress { font-size: 0.85em; color: var(--text-light); }
+.topbar .progress span { color: var(--green); font-weight: 600; }
+
+/* Content Area */
+.content {
+  max-width: 860px;
+  padding: 32px 40px 60px;
+  margin: 0 auto;
+}
+
+.content-section { display: none; }
+.content-section.active { display: block; }
+
+.content h1 { font-size: 2em; margin-bottom: 6px; color: #111; }
+.content .subtitle { color: var(--text-light); margin-bottom: 28px; font-size: 1.05em; }
+
+.content h2 {
+  font-size: 1.4em;
+  margin: 36px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--green);
+  color: #111;
+}
+
+.content h3 { font-size: 1.15em; margin: 24px 0 10px; color: #222; }
+
+.content p { margin-bottom: 14px; }
+
+.content ul, .content ol { margin: 0 0 16px 22px; }
+.content li { margin-bottom: 6px; }
+
+/* ========================================
+   CODE BLOCKS
+   ======================================== */
+
+.code-block {
+  background: var(--code-bg);
+  color: #d4d4d4;
+  border-radius: 8px;
+  margin: 16px 0;
+  position: relative;
+  overflow: hidden;
+}
+.code-block .lang-tag {
+  position: absolute; top: 8px; right: 52px;
+  font-size: 0.7em; color: rgba(255,255,255,0.35);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.code-block pre {
+  padding: 18px 20px;
+  overflow-x: auto;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 0.9em;
+  line-height: 1.6;
+  tab-size: 4;
+}
+.code-block pre::-webkit-scrollbar { height: 4px; }
+.code-block pre::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.copy-btn {
+  position: absolute; top: 8px; right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none; color: rgba(255,255,255,0.5);
+  padding: 4px 10px; border-radius: 4px; cursor: pointer;
+  font-size: 0.75em; transition: all 0.15s;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.copy-btn.copied { background: var(--green); color: #fff; }
+
+/* Inline code */
+code {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 0.88em;
+  color: #c7254e;
+}
+
+/* ========================================
+   CALLOUT BOXES
+   ======================================== */
+
+.callout {
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin: 16px 0;
+  border-left: 4px solid;
+}
+.callout.tip {
+  background: #e8f5e9;
+  border-color: var(--green);
+  color: #1b5e20;
+}
+.callout.warning {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: #856404;
+}
+.callout.info {
+  background: #e3f2fd;
+  border-color: var(--blue);
+  color: #0d47a1;
+}
+
+/* ========================================
+   EXERCISES
+   ======================================== */
+
+.exercise-box {
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin: 24px 0;
+}
+.exercise-box h4 { margin-bottom: 10px; color: #111; font-size: 1.05em; }
+.exercise-box p { margin-bottom: 10px; }
+.exercise-box .task { font-weight: 500; }
+
+.answer-toggle {
+  display: inline-block;
+  margin-top: 10px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background 0.15s;
+}
+.answer-toggle:hover { background: var(--green-dark); }
+.answer-toggle.shown { background: var(--text-light); }
+
+.answer-content {
+  display: none;
+  margin-top: 14px;
+  padding: 16px 18px;
+  background: var(--answer-bg);
+  border: 1px solid var(--answer-border);
+  border-radius: 6px;
+}
+.answer-content.show { display: block; }
+.answer-content .code-block { margin: 8px 0; }
+
+/* ========================================
+   NEXT / PREV NAVIGATION
+   ======================================== */
+
+.nav-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9em;
+}
+.nav-btn.prev { background: var(--bg-light); color: var(--text); }
+.nav-btn.prev:hover { background: var(--border); }
+.nav-btn.next { background: var(--green); color: #fff; margin-left: auto; }
+.nav-btn.next:hover { background: var(--green-dark); }
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+/* ========================================
+   KEY CONCEPT CARDS
+   ======================================== */
+
+.concept-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 20px 0;
+}
+.concept-card h3 { color: #fff; margin-top: 0; }
+.concept-card code { background: rgba(255,255,255,0.2); color: #fff; }
+.concept-card.alt { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+/* ========================================
+   TABLE
+   ======================================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 24px;
+  font-size: 0.93em;
+}
+th, td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th { background: var(--bg-light); font-weight: 600; color: #111; }
+tr:hover td { background: #fafafa; }
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .main { margin-left: 0; }
+  .content { padding: 20px 18px 40px; }
+  .topbar { padding: 10px 18px; }
+}
