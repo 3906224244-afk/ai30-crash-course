@@ -1,0 +1,277 @@
+/* ========== question-card 原子组件样式 ========== */
+
+.card-container {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  margin: 0 16px;
+  padding: 20px 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== 进度条 ===== */
+.progress-area {
+  margin-bottom: 16px;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #e94560;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.progress-bar {
+  height: 4px;
+  background: #e8e8e8;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e94560, #c23152);
+  border-radius: 2px;
+}
+
+/* ===== 问题正文 ===== */
+.question-text {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a1a2e;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* ===== choice 型选项 ===== */
+.q-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.q-option {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.q-option.selected {
+  background: #fef2f2;
+  border-color: #e94560;
+}
+
+.option-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.option-badge text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.badge-selected {
+  background: #e94560;
+}
+.badge-selected text {
+  color: #fff;
+}
+
+.option-text {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ===== 语音引导区（替代 textarea） ===== */
+.voice-guide {
+  margin-bottom: 12px;
+  padding: 16px 12px;
+  background: #f0f7ff;
+  border: 1px solid #b8d8f0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.voice-icon {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.voice-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+}
+
+.voice-hint {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+}
+
+.voice-guide-free {
+  background: #fef9e7;
+  border-color: #f0d060;
+}
+
+/* ===== free 型方向提示 ===== */
+.direction-hints {
+  margin-bottom: 12px;
+}
+
+.hints-title {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.hints-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hint-chip {
+  padding: 4px 10px;
+  border: 1px dashed #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.hint-chip text {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ===== 操作按钮 ===== */
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-skip {
+  padding: 8px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #999;
+}
+
+.btn-submit {
+  padding: 8px 24px;
+  background: linear-gradient(135deg, #e94560, #c23152);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-submit.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: linear-gradient(transparent, #fff);
+  pointer-events: none;
+}
+
+/* ========== 暗黑模式 ========== */
+@media (prefers-color-scheme: dark) {
+  .card-container {
+    background: #2a2a2e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .progress-bar {
+    background: #404040;
+  }
+
+  .question-text {
+    color: #e0e0e0;
+  }
+
+  .q-option {
+    border-color: #404040;
+  }
+
+  .q-option.selected {
+    background: #3a2020;
+  }
+
+  .option-badge {
+    background: #404040;
+  }
+  .option-badge text {
+    color: #a0a0a0;
+  }
+
+  .option-text {
+    color: #b0b0b0;
+  }
+
+  .voice-guide {
+    background: #1a2a3a;
+    border-color: #2a4a6a;
+  }
+
+  .voice-title {
+    color: #e0e0e0;
+  }
+
+  .voice-hint {
+    color: #808080;
+  }
+
+  .voice-guide-free {
+    background: #3a3020;
+    border-color: #5a4a20;
+  }
+
+  .hint-chip {
+    background: #333;
+    border-color: #404040;
+  }
+
+  .hint-chip text,
+  .hints-title {
+    color: #808080;
+  }
+
+  .btn-skip {
+    border-color: #404040;
+    color: #808080;
+  }
+
+  .bottom-fade {
+    background: linear-gradient(transparent, #2a2a2e);
+  }
+}

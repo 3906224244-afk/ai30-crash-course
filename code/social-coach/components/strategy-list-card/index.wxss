@@ -1,0 +1,342 @@
+/* ========== strategy-list-card 原子组件样式 ========== */
+
+.card-container {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  margin: 0 16px;
+  padding: 20px 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== 引导区 ===== */
+.guide-section {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.context-badge {
+  font-size: 12px;
+  color: #e94560;
+  background: #fef2f2;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.guide-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.guide-intro {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.6;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* 快速参考表 */
+.quick-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.ref-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 8px;
+  border-radius: 4px;
+}
+
+
+.ref-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.ref-desc {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.guide-tip {
+  background: #fef9e7;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.guide-tip text {
+  font-size: 12px;
+  color: #b7950b;
+  line-height: 1.5;
+}
+
+/* ===== 策略列表 ===== */
+.strategies-section {
+  margin-bottom: 12px;
+}
+
+.section-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+/* 策略行 */
+.strategy-row {
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+/* 折叠头 */
+.strategy-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.strategy-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.strategy-preview {
+  font-size: 12px;
+  color: #666;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expand-arrow {
+  font-size: 12px;
+  color: #bbb;
+  flex-shrink: 0;
+}
+
+/* 展开体 */
+.strategy-body {
+  padding: 0 12px 12px 12px;
+}
+
+/* 话术区 */
+.script-area {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.script-text {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.8;
+  display: block;
+  padding-right: 50px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #e94560;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.copy-btn text {
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+}
+
+
+/* 详细信息 */
+.meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.meta-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.meta-value {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.risk-meta .meta-value {
+  color: #c0392b;
+}
+
+/* 战略标注 */
+.strategy-note {
+  background: linear-gradient(135deg, #fef2f2, #fef9e7);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.note-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c23152;
+  margin-bottom: 4px;
+}
+
+.note-text {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 展开全部按钮 */
+.show-all-btn {
+  text-align: center;
+  padding: 8px 0;
+  border-top: 1px dashed #e8e8e8;
+}
+
+.show-all-btn text {
+  font-size: 12px;
+  color: #e94560;
+}
+
+
+.bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(transparent, #fff);
+  pointer-events: none;
+}
+
+/* ========== 暗黑模式 ========== */
+@media (prefers-color-scheme: dark) {
+  .card-container {
+    background: #2a2a2e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .guide-section {
+    border-bottom-color: #404040;
+  }
+
+  .context-badge {
+    background: #3a2020;
+  }
+
+  .guide-title {
+    color: #e0e0e0;
+  }
+
+  .guide-intro {
+    color: #808080;
+  }
+
+  .ref-desc {
+    color: #a0a0a0;
+  }
+
+
+  .guide-tip {
+    background: #3a3020;
+  }
+
+  .guide-tip text {
+    color: #c0a010;
+  }
+
+  .section-label {
+    color: #a0a0a0;
+  }
+
+  .strategy-row {
+    background: #333;
+  }
+
+  .strategy-preview {
+    color: #a0a0a0;
+  }
+
+  .expand-arrow {
+    color: #808080;
+  }
+
+  .script-area {
+    background: #1a1a2e;
+  }
+
+  .script-text {
+    color: #b0b0b0;
+  }
+
+  .meta-value {
+    color: #a0a0a0;
+  }
+
+  .risk-meta .meta-value {
+    color: #e07070;
+  }
+
+  .strategy-note {
+    background: linear-gradient(135deg, #3a2020, #3a3020);
+  }
+
+  .note-text {
+    color: #a0a0a0;
+  }
+
+  .show-all-btn {
+    border-top-color: #404040;
+  }
+
+  .bottom-fade {
+    background: linear-gradient(transparent, #2a2a2e);
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "getSocialAdvice",
+  "version": "1.0.0",
+  "description": "人情世故顾问 - 核心原子接口。分析社交场景、追问补全信息、生成5条策略",
+  "main": "index.js",
+  "dependencies": {}
+}

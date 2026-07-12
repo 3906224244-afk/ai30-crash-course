@@ -1,0 +1,136 @@
+/* ========== 咨询页样式（页面级，非原子组件，故允许过渡和动画） ========== */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24rpx;
+}
+
+/* Step Header */
+.step-header {
+  text-align: center;
+  padding: 60rpx 0 40rpx;
+}
+
+.step-icon {
+  font-size: 64rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.step-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1a1a2e;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.step-sub {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* ===== Step 0: 场景输入 ===== */
+.situation-input {
+  width: 100%;
+  min-height: 280rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  font-size: 30rpx;
+  box-sizing: border-box;
+  margin-bottom: 32rpx;
+  border: 2rpx solid #e8e8e8;
+  transition: border-color 0.3s;
+}
+
+.situation-input:focus {
+  border-color: #e94560;
+}
+
+.quick-examples {
+  margin-bottom: 40rpx;
+}
+
+.example-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.example-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tag {
+  background: #fff;
+  padding: 12rpx 24rpx;
+  border-radius: 32rpx;
+  font-size: 24rpx;
+  color: #e94560;
+  border: 2rpx solid #fecdd3;
+  transition: all 0.2s;
+}
+
+.tag:active {
+  background: #e94560;
+  color: #fff;
+}
+
+/* ===== Step 2: 加载中 ===== */
+.loading-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.loading-icon {
+  font-size: 80rpx;
+  animation: pulse 1.5s infinite;
+}
+
+.loading-text {
+  font-size: 32rpx;
+  color: #666;
+  margin-top: 32rpx;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #e94560;
+  animation: bounce 0.6s infinite alternate;
+}
+
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-20rpx); opacity: 0.4; }
+}
+
+/* ===== Step 3: 重置按钮 ===== */
+.reset-btn {
+  margin-top: 32rpx;
+  display: block;
+  width: 100%;
+}

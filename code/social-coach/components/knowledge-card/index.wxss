@@ -1,0 +1,162 @@
+/* ========== knowledge-card 原子组件样式 ========== */
+
+.card-container {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  margin: 0 16px;
+  padding: 20px 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 标题区 */
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header-icon {
+  font-size: 17px;
+  margin-right: 8px;
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a1a2e;
+  line-height: 1.4;
+}
+
+.card-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin-bottom: 16px;
+}
+
+/* 正文 */
+.card-content {
+  margin-bottom: 16px;
+}
+
+.content-text {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.8;
+  /* 长文本截断：限制最大高度 ≈ 8行 × 1.8行高 × 15px */
+  display: block;
+  max-height: 216px;
+  overflow: hidden;
+}
+
+/* 要点提示 */
+.tips-section {
+  background: #fafafa;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.tips-header {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.tip-dot {
+  font-size: 15px;
+  color: #e94560;
+  margin-right: 6px;
+  line-height: 1.6;
+}
+
+.tip-text {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* 底部：来源 + 确认 */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.source-text {
+  font-size: 12px;
+  color: #bbb;
+}
+
+.ack-btn {
+  background: #e94560;
+  color: #fff;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(transparent, #fff);
+  pointer-events: none;
+}
+
+/* ========== 暗黑模式 ========== */
+@media (prefers-color-scheme: dark) {
+  .card-container {
+    background: #2a2a2e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-title {
+    color: #e0e0e0;
+  }
+
+  .card-divider {
+    background: #404040;
+  }
+
+  .content-text {
+    color: #b0b0b0;
+  }
+
+  .tips-section {
+    background: #333;
+  }
+
+  .tips-header {
+    color: #a0a0a0;
+  }
+
+  .tip-text {
+    color: #a0a0a0;
+  }
+
+  .source-text {
+    color: #808080;
+  }
+
+  .bottom-fade {
+    background: linear-gradient(transparent, #2a2a2e);
+  }
+}

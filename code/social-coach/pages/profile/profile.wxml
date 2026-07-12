@@ -1,0 +1,60 @@
+<!-- 前置录入：建立人设档案 -->
+<view class="container">
+
+  <view class="step-header">
+    <text class="step-icon">📝</text>
+    <text class="step-title">建立你的人设档案</text>
+    <text class="step-sub">大约1-2分钟，以后每次咨询都会更懂你</text>
+  </view>
+
+  <view class="progress-bar">
+    <view class="progress-fill" style="width: {{(currentStep / totalSteps) * 100}}%"></view>
+  </view>
+
+  <view class="question-card">
+    <text class="q-label">第{{currentStep}}题 / 共{{totalSteps}}题</text>
+    <text class="q-text">{{questions[currentStep-1].text}}</text>
+
+    <view wx:if="{{questions[currentStep-1].type === 'choice'}}">
+      <view class="q-options">
+        <view
+          wx:for="{{questions[currentStep-1].options}}"
+          wx:key="label"
+          class="q-option {{item.selected ? 'selected' : ''}}"
+          data-index="{{index}}"
+          bindtap="selectOption"
+        >
+          <text class="option-label">{{item.label}}</text>
+          <text class="option-text">{{item.text}}</text>
+        </view>
+      </view>
+      <view class="q-custom" wx:if="{{showCustomInput}}">
+        <text class="custom-label">✍️ 用你自己的话描述：</text>
+        <textarea class="custom-input" placeholder="输入你的回答..." value="{{customAnswer}}" bindinput="onCustomInput" />
+      </view>
+    </view>
+
+    <view wx:if="{{questions[currentStep-1].type === 'free'}}">
+      <view class="direction-table">
+        <text class="direction-title">📋 参考方向（想到了就填，不强制）</text>
+        <view class="direction-grid">
+          <view class="direction-item" wx:for="{{directionHints}}" wx:key="*this">
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="q-free-area">
+        <textarea class="free-input" placeholder="比如：你的身份、重要的关系...（可跳过）" value="{{customAnswer}}" bindinput="onCustomInput" auto-height />
+      </view>
+    </view>
+
+    <view class="q-actions">
+      <view class="btn-secondary" wx:if="{{currentStep > 1}}" bindtap="prevStep">上一题</view>
+      <view class="btn-primary" bindtap="nextStep">{{currentStep === totalSteps ? '完成录入' : '下一题'}}</view>
+    </view>
+
+    <view class="skip-link" wx:if="{{currentStep === totalSteps}}">
+      <text bindtap="skipAll">暂时跳过，以后再说</text>
+    </view>
+  </view>
+</view>

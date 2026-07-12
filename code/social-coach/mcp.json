@@ -1,0 +1,117 @@
+{
+  "name": "social-coach",
+  "description": "当用户不知道怎么回复消息、拒绝别人、化解人际冲突时使用。典型表达：帮我回一下、怎么回、怎么拒绝、怎么措辞、帮我想想怎么跟他说、该怎么说、这样回合适吗、不知道怎么开口、纠结怎么回、帮我组织语言、帮我想个理由、怎么回复领导/导师/暧昧对象、被阴阳了怎么回、得罪人了怎么道歉、怎么追人怎么开场、见家长/丈母娘怎么办、随份子多少钱、敬酒怎么说、送礼送什么。核心判断：用户面对一个具体的人或小群体，需要沟通话术或社交策略——选这个Skill。如果用户要写文章、写演讲稿、写文案等非人际沟通内容——不选这个Skill。",
+
+  "tools": [
+    {
+      "name": "getSocialAdvice",
+      "description": "当用户描述了一个社交场景、需要回复建议时调用此工具。典型触发：用户说'帮我回一下'、'怎么跟他说'、'帮我措个辞'——需要跟一个具体的人沟通。工具会分析信息完整性——如果信息不足则返回追问让用户补充，信息齐全则返回5条不同策略路径的回复方案（含话术、节奏、对方反问预判和风险提示）。此工具支持多轮：每次调用带上上一轮的返回结果，工具会判断当前处于哪个阶段（分流/追问/生成）并返回对应的卡片。注意：如果用户只是询问社交规则行情（如'随份子多少钱'、'敬酒怎么说'）而不涉及回复某个具体的人——用querySocialRule而不是本工具。如果用户既问了规则又有具体沟通需求——优先用本工具。",
+
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "situation": {
+            "type": "string",
+            "description": "用户描述的社交场景原文。取值来源：从用户在当前对话中的原话逐字提取，保留完整语气词和上下文细节，不得删减或改写。如果用户已回答过追问，将新的回答原文拼入此字段。禁止编造：用户未提供场景描述时不得调用本工具——应使用querySocialRule或反问用户'你想让我帮你怎么回？'来引导用户描述场景。"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": { "type": "string", "description": "上一轮工具返回的追问问题原文。取值来源：从对话历史中本工具上一次返回的card.text字段复制。禁止编造：不得自行改写问题文字。" },
+                "answer": { "type": "string", "description": "用户对该问题的回答。取值来源：从用户在当前轮次的对话回复中提取。如果用户未作答或跳过，填入空字符串''。禁止编造：不得替用户编造回答内容。" }
+              }
+            },
+            "description": "之前追问的问答记录。取值来源：从对话历史中提取——每次本工具返回追问卡片后用户给出的回答。第一轮调用时传空数组[]。后续每次调用将新的问答对追加到此数组末尾。禁止编造：不得自行生成问答对；如果用户跳过了某题，answer字段留空字符串''。"
+          },
+          "phase": {
+            "type": "string",
+            "enum": ["auto", "split", "ask", "generate"],
+            "description": "当前阶段标识。取值来源（按优先级判断）：如果用户刚匹配进来、还没选择模式，取值split；如果用户已回答了上一轮的追问，取值ask；如果信息已齐全或用户明确表达'出结果吧/帮我生成/给我建议'，取值generate；如果以上条件均无法判断，取值auto让工具自行判断当前阶段。禁止编造：不要在信息不齐全时传generate——只有当answers数组已覆盖所有追问维度时才可传generate。"
+          },
+          "profile": {
+            "type": "object",
+            "description": "用户预存的人设信息。取值来源：通过storage接口读取用户在原小程序中录入的人设档案数据。如果用户未设置人设，传空对象{}。禁止编造：不得自行填充或猜测用户的人设信息。"
+          }
+        },
+        "required": ["situation", "phase"]
+      },
+
+      "returns": {
+        "description": "返回内容严格遵循'事实 + 动作'两段式结构。fact 字段描述工具做了什么分析、发现了什么信息——AI将此内容作为后续推理的上下文地基。action 字段描述AI下一步应该做什么——向用户展示本接口返回的卡片数据，并用简短一句话引导用户操作。禁止：只有action没有fact（裸指令）会导致AI跳过用户确认直接下一步。禁止：在action中描述卡片内容而不引导展示卡片数据。",
+        "format": {
+          "fact": "string。描述工具的分析结果和当前信息收集状态。AI将本字段内容作为后续推理的事实依据。",
+          "action": "string。明确的下一步指令。格式：'请把本次接口返回的卡片数据展示给用户，并[引导文案]。'卡片类型包括：split（分流选择）、question（追问）、strategy_list（策略结果列表）。",
+          "card": "object。卡片的结构化数据，由原子组件渲染为对话流GUI卡片。card.type取值为split / question / strategy_list。"
+        }
+      }
+    },
+
+    {
+      "name": "querySocialRule",
+      "description": "当用户询问社交礼仪规则或行情标准时调用此工具，不涉及用户人设。典型场景：'随份子多少钱'、'敬酒怎么说'、'送什么礼物'、'见家长注意什么'。与getSocialAdvice的区别：本工具不需要追问，直接返回结构化知识卡片。如果用户问的是'我该怎么回某人'这种需要人设的沟通问题——用getSocialAdvice而不是本工具。如果无法判断——优先用getSocialAdvice。",
+
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ruleType": {
+            "type": "string",
+            "description": "用户询问的社交规则类型。取值来源：从用户的提问原文中提取并归类。归类示例：用户说'同事结婚包多少'→归类为'随份子行情'；用户说'第一次见女朋友爸妈带什么'→归类为'送礼规则'；用户说'怎么给领导敬酒'→归类为'敬酒礼仪'。禁止编造：不要自行编造类型名称——必须是从用户原话中可以合理归类的类型。如果用户提问无法归类到已有规则类型，ruleType填入用户的原始提问原文，让工具自行做模糊匹配。"
+          },
+          "context": {
+            "type": "string",
+            "description": "用户提供的额外上下文。取值来源：从用户原话中提取的城市、行业、关系亲疏、自身经济状况等信息。例如用户说'我在深圳，月薪8K，普通同事'→提取为'深圳/月薪8K/普通同事'。禁止编造：用户未提及的信息不得自行补充。如果用户没有提供任何上下文，留空字符串''。"
+          }
+        },
+        "required": ["ruleType"]
+      },
+
+      "returns": {
+        "description": "返回内容严格遵循'事实 + 动作'两段式。fact 字段说明查询了什么规则及其关键信息。action 字段指引AI展示知识卡片。",
+        "format": {
+          "fact": "string。查询结果的事实陈述，包括规则内容和适用条件。",
+          "action": "string。格式：'请把本次接口返回的卡片数据展示给用户。'",
+          "card": "object。知识卡片的结构化数据，card.type取值为knowledge。"
+        }
+      }
+    }
+  ],
+  "components": [
+    {
+      "type": "split",
+      "name": "分流选择卡片",
+      "path": "/components/split-card/index",
+      "description": "用于分流用户选择：急需答案 vs 提前录入。用户在微信AI对话流中点击选项后，组件通过sendFollowUpMessage回传选择结果。",
+      "relatedPage": "/pages/index/index"
+    },
+    {
+      "type": "question",
+      "name": "追问卡片",
+      "path": "/components/question-card/index",
+      "description": "用于多轮追问收集用户信息。支持选择题型(ABC+D)和自由补充题型。用户回答后组件回传答案并触发下一轮API调用。",
+      "relatedPage": "/pages/advice/advice"
+    },
+    {
+      "type": "strategy_list",
+      "name": "5条策略结果卡片",
+      "path": "/components/strategy-list-card/index",
+      "description": "展示5条沟通策略路径，包含话术、节奏、反问预判、风险提示和战略标注。用户可选择复制话术。采用折叠展开模式控制卡片高度。",
+      "relatedPage": "/pages/advice/advice"
+    },
+    {
+      "type": "knowledge",
+      "name": "知识卡片",
+      "path": "/components/knowledge-card/index",
+      "description": "展示社交规则/礼仪知识，包含内容、要点提示和来源。只读展示型卡片。",
+      "relatedPage": "/pages/etiquette/etiquette"
+    },
+    {
+      "type": "text",
+      "name": "兜底文本卡片",
+      "path": "/components/text-card/index",
+      "description": "兜底文本展示卡片，用于展示无法匹配到特定卡片类型的文本内容。最简单的卡片格式。",
+      "relatedPage": "/pages/index/index"
+    }
+  ]
+}

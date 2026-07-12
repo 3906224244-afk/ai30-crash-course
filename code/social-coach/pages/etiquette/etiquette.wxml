@@ -1,0 +1,71 @@
+<!-- 知识库浏览页 -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-icon">📚</text>
+    <text class="page-title">社交知识库</text>
+    <text class="page-sub">查阅常见社交规则和人情世故</text>
+  </view>
+
+  <!-- 搜索 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      placeholder="搜索礼仪规则、行情..."
+      value="{{keyword}}"
+      bindinput="onSearch"
+    />
+  </view>
+
+  <!-- 分类 -->
+  <scroll-view class="categories" scroll-x>
+    <view
+      wx:for="{{categories}}"
+      wx:key="*this"
+      class="cat-tag {{activeCategory === item ? 'active' : ''}}"
+      data-cat="{{item}}"
+      bindtap="switchCategory"
+    >
+      <text>{{item}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 条目列表 -->
+  <view class="entry-list">
+    <view
+      wx:for="{{filteredEntries}}"
+      wx:key="id"
+      class="entry-card"
+      data-id="{{item.id}}"
+      bindtap="viewDetail"
+    >
+      <view class="entry-header">
+        <text class="entry-icon">{{item.icon}}</text>
+        <view class="entry-info">
+          <text class="entry-title">{{item.title}}</text>
+          <text class="entry-brief">{{item.brief}}</text>
+        </view>
+      </view>
+      <view class="entry-tags">
+        <text class="e-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{filteredEntries.length === 0}}">
+      <text>暂无匹配内容，更多知识持续更新中...</text>
+    </view>
+  </view>
+
+  <!-- 详情弹窗 -->
+  <view class="detail-mask" wx:if="{{showDetail}}" bindtap="closeDetail">
+    <view class="detail-card" catchtap="">
+      <text class="detail-title">{{currentEntry.title}}</text>
+      <view class="detail-divider"></view>
+      <text class="detail-content">{{currentEntry.content}}</text>
+      <view class="detail-source" wx:if="{{currentEntry.source}}">
+        <text>📌 来源：{{currentEntry.source}}</text>
+      </view>
+      <button class="btn-primary detail-close" bindtap="closeDetail">知道了</button>
+    </view>
+  </view>
+</view>

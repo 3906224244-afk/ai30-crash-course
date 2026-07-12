@@ -1,0 +1,7 @@
+{
+  "name": "querySocialRule",
+  "version": "1.0.0",
+  "description": "社交礼仪规则查询。不涉及用户人设，直接返回结构化知识",
+  "main": "index.js",
+  "dependencies": {}
+}

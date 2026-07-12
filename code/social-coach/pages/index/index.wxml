@@ -1,0 +1,28 @@
+<!-- 分流页 -->
+<view class="container">
+  <view class="hero">
+    <text class="hero-emoji">🎯</text>
+    <text class="hero-title">人情世故顾问</text>
+    <text class="hero-sub">社交场景AI助手 · 帮你把话说对</text>
+  </view>
+
+  <view class="split-area">
+    <view class="split-card urgent" bindtap="goAdvice">
+      <view class="card-icon">🆘</view>
+      <text class="card-title">急需答案</text>
+      <text class="card-desc">直接说问题，我边问边记，立刻给你方案</text>
+      <view class="card-arrow">→</view>
+    </view>
+
+    <view class="split-card prepare" bindtap="goProfile">
+      <view class="card-icon">📝</view>
+      <text class="card-title">提前录入</text>
+      <text class="card-desc">花1-2分钟建你的人设档案，以后咨询更快更准</text>
+      <view class="card-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="hint" wx:if="{{hasProfile}}">
+    <text>✅ 你已有存档人设，可以直接咨询</text>
+  </view>
+</view>

@@ -1,0 +1,49 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/advice/advice",
+    "pages/profile/profile",
+    "pages/etiquette/etiquette"
+  ],
+  "usingComponents": {
+    "split-card": "/components/split-card/index",
+    "question-card": "/components/question-card/index",
+    "strategy-list-card": "/components/strategy-list-card/index",
+    "knowledge-card": "/components/knowledge-card/index",
+    "text-card": "/components/text-card/index"
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#1a1a2e",
+    "navigationBarTitleText": "人情世故顾问",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#e94560",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "咨询",
+        "iconPath": "images/icon-ask.png",
+        "selectedIconPath": "images/icon-ask-active.png"
+      },
+      {
+        "pagePath": "pages/etiquette/etiquette",
+        "text": "知识库",
+        "iconPath": "images/icon-book.png",
+        "selectedIconPath": "images/icon-book-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/icon-me.png",
+        "selectedIconPath": "images/icon-me-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
