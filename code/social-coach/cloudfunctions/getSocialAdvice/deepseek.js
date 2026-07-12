@@ -12,7 +12,7 @@ const https = require('https');
 const { DEEPSEEK_API_KEY } = require('./secret.js');
 
 const API_URL = 'api.deepseek.com';
-const MODEL = 'deepseek-chat'; // 2026-07-24 前使用，之后迁移到 deepseek-v4-pro
+var MODEL = 'deepseek-v4-pro';
 
 /**
  * 调用 DeepSeek Chat Completions
