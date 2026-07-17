@@ -1,31 +1,14 @@
 <wxs module="utils">
-/** 截断话术预览 */
 var truncate = function (script, maxLen) {
   if (!script) return '';
   maxLen = maxLen || 40;
   if (script.length <= maxLen) return script;
   return script.substring(0, maxLen) + '...';
 };
-
-/** 获取策略颜色 */
-var getColor = function (typeKey) {
-  var colors = {
-    positive:  { badgeBg: '#e8f8f5', badgeText: '#16a085', border: '#4ecdc4' },
-    defensive: { badgeBg: '#e8f4fd', badgeText: '#2980b9', border: '#45b7d1' },
-    reverse:   { badgeBg: '#fef9e7', badgeText: '#d68910', border: '#f39c12' },
-    humor:     { badgeBg: '#fdedf4', badgeText: '#c0392b', border: '#e056a0' },
-    direct:    { badgeBg: '#fdedec', badgeText: '#c0392b', border: '#e94560' }
-  };
-  return colors[typeKey] || colors.direct;
-};
-
-module.exports = {
-  truncate: truncate,
-  getColor: getColor
-};
+module.exports = { truncate: truncate };
 </wxs>
 
-<view class="card-container" style="max-height: {{_maxHeight}}px;">
+<view class="card-container">
 
   <!-- ===== 引导区 ===== -->
   <view class="guide-section">
@@ -44,8 +27,8 @@ module.exports = {
         data-index="{{index}}"
         bindtap="onTapGuideRow"
       >
-        <view class="ref-badge" style="background: {{utils.getColor(item.bg.replace('-bg','')).badgeBg}};">
-          <text style="color: {{utils.getColor(item.bg.replace('-bg','')).badgeText}}; font-size: 12px; font-weight: 600;">{{item.label}}</text>
+        <view class="ref-badge">
+          <text>{{item.label}}</text>
         </view>
         <text class="ref-desc">{{item.desc}}</text>
       </view>
@@ -58,30 +41,31 @@ module.exports = {
 
   <!-- ===== 策略列表 ===== -->
   <view class="strategies-section">
-    <text class="section-label">📋 5条策略路径</text>
+    <view class="section-label-row">
+      <image class="section-icon" src="/images/strategy-paths.svg" mode="aspectFit" />
+      <text class="section-label">{{strategies.length}}条策略路径</text>
+    </view>
 
     <view
       wx:for="{{strategies}}"
       wx:key="typeKey"
       class="strategy-row {{expandedIndex === index ? 'expanded' : ''}}"
-      style="border-left: 4px solid {{utils.getColor(item.typeKey).border}};"
     >
-      <!-- 折叠态：标签 + 话术预览 -->
+      <!-- 折叠态 -->
       <view
         class="strategy-header"
         data-index="{{index}}"
         bindtap="onToggleStrategy"
       >
-        <view class="strategy-badge" style="background: {{utils.getColor(item.typeKey).badgeBg}};">
-          <text style="color: {{utils.getColor(item.typeKey).badgeText}}; font-size: 12px; font-weight: 600;">{{item.typeLabel}}</text>
+        <view class="strategy-badge">
+          <text>{{item.typeLabel}}</text>
         </view>
         <text class="strategy-preview">{{utils.truncate(item.script, 40)}}</text>
         <text class="expand-arrow">{{expandedIndex === index ? '▲' : '▼'}}</text>
       </view>
 
-      <!-- 展开态：完整内容 -->
+      <!-- 展开态 -->
       <view class="strategy-body" wx:if="{{expandedIndex === index}}">
-        <!-- 话术 + 复制按钮 -->
         <view class="script-area">
           <text class="script-text">{{item.script}}</text>
           <view
@@ -90,44 +74,40 @@ module.exports = {
             data-type-label="{{item.typeLabel}}"
             bindtap="onCopyScript"
           >
+            <image class="btn-bg-img" src="/images/btn-small-bg.png" mode="aspectFill" />
             <text>复制</text>
           </view>
         </view>
 
-        <!-- 详细信息 -->
         <view class="meta-list">
-          <!-- 回复节奏 -->
           <view class="meta-row">
-            <text class="meta-icon">⏱️</text>
+            <image class="meta-icon" src="/images/strategy-rhythm.svg" mode="aspectFit" />
             <text class="meta-label">回复节奏：</text>
             <text class="meta-value">{{item.rhythm}}</text>
           </view>
 
-          <!-- 对方反问预判 -->
           <view class="meta-row">
-            <text class="meta-icon">🔄</text>
+            <image class="meta-icon" src="/images/strategy-counter.svg" mode="aspectFit" />
             <text class="meta-label">对方可能反问：</text>
             <text class="meta-value">{{item.counterQuestion}}</text>
           </view>
 
-          <!-- 风险提示 -->
           <view class="meta-row risk-meta">
-            <text class="meta-icon">⚠️</text>
+            <image class="meta-icon" src="/images/strategy-risk.svg" mode="aspectFit" />
             <text class="meta-label">风险提示：</text>
             <text class="meta-value">{{item.risk}}</text>
           </view>
         </view>
 
-        <!-- 战略标注 -->
         <view class="strategy-note">
-          <text class="note-label">💡 战略标注</text>
+          <image class="meta-icon" src="/images/strategy-note.svg" mode="aspectFit" />
+          <text class="note-label">战略标注</text>
           <text class="note-text">{{item.strategicNote}}</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 展开全部按钮 -->
   <view class="show-all-btn" wx:if="{{strategies.length > 3 && expandedIndex === -1}}" bindtap="onToggleShowAll">
     <text>{{showAll ? '收起策略' : '查看全部 ' + strategies.length + ' 条策略'}}</text>
   </view>

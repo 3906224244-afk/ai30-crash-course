@@ -1,17 +1,18 @@
-<view class="card-container" style="max-height: {{_maxHeight}}px;">
+<!-- question-card — 手绘便签式 -->
+<view class="card-container">
 
   <!-- 进度条 -->
   <view class="progress-area">
     <text class="progress-text">第{{questionIndex}}题 / 共{{totalQuestions}}题</text>
     <view class="progress-bar">
-      <view class="progress-fill" style="width: {{(questionIndex / totalQuestions) * progressMaxWidth}}px;"></view>
+      <view class="progress-fill" style="width: {{(questionIndex / totalQuestions) * 100}}%;"></view>
     </view>
   </view>
 
   <!-- 问题正文 -->
   <text class="question-text">{{text}}</text>
 
-  <!-- ========== choice 型 ========== -->
+  <!-- ========== choice 型：手绘便签选项 ========== -->
   <view class="choice-area" wx:if="{{questionType === 'choice'}}">
     <view class="q-options">
       <view
@@ -29,19 +30,21 @@
       </view>
     </view>
 
-    <!-- D 选项 → 语音引导（替代 textarea） -->
+    <!-- 语音引导 -->
     <view class="voice-guide" wx:if="{{showVoiceGuide}}">
-      <text class="voice-icon">🎤</text>
+      <image class="voice-icon" src="/images/ui-mic.svg" mode="aspectFit" />
       <text class="voice-title">请直接对微信说出你的回答</text>
       <text class="voice-hint">点击下方按钮后，用语音描述你的具体情况</text>
     </view>
 
     <!-- 操作按钮 -->
     <view class="action-row">
-      <view class="btn-skip" bindtap="onSkipChoice">
+      <view class="btn-outline" bindtap="onSkipChoice">
+        <image class="btn-bg-img" src="/images/btn-small-bg.png" mode="aspectFill" />
         <text>跳过</text>
       </view>
-      <view class="btn-submit {{selectedIndex === -1 ? 'disabled' : ''}}" bindtap="onSubmitChoice">
+      <view class="btn-primary btn-submit {{selectedIndex === -1 ? 'disabled' : ''}}" bindtap="onSubmitChoice">
+        <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
         <text>{{isLast ? '查看结果' : '下一题'}}</text>
       </view>
     </view>
@@ -49,9 +52,8 @@
 
   <!-- ========== free 型 ========== -->
   <view class="free-area" wx:if="{{questionType === 'free'}}">
-    <!-- 方向提示 -->
     <view class="direction-hints" wx:if="{{directionHints.length > 0}}">
-      <text class="hints-title">📋 参考方向（想到了就说，不强制）</text>
+      <text class="hints-title">参考方向（想到了就说，不强制）</text>
       <view class="hints-grid">
         <view class="hint-chip" wx:for="{{directionHints}}" wx:key="*this">
           <text>{{item}}</text>
@@ -59,19 +61,19 @@
       </view>
     </view>
 
-    <!-- 语音引导（替代 textarea） -->
     <view class="voice-guide voice-guide-free">
-      <text class="voice-icon">🎤</text>
+      <image class="voice-icon" src="/images/ui-mic.svg" mode="aspectFit" />
       <text class="voice-title">请直接说出你想补充的内容</text>
       <text class="voice-hint">任何细节都可以——身份、关系、困境、顾虑……想到了就说出来</text>
     </view>
 
-    <!-- 操作按钮 -->
     <view class="action-row">
-      <view class="btn-skip" bindtap="onSkipFree">
+      <view class="btn-outline" bindtap="onSkipFree">
+        <image class="btn-bg-img" src="/images/btn-small-bg.png" mode="aspectFill" />
         <text>跳过补充</text>
       </view>
-      <view class="btn-submit" bindtap="onSubmitFree">
+      <view class="btn-primary btn-submit" bindtap="onSubmitFree">
+        <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
         <text>查看结果</text>
       </view>
     </view>

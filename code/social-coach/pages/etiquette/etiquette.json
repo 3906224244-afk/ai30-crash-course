@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "社交知识库",
-  "navigationBarBackgroundColor": "#1a1a2e",
-  "navigationBarTextStyle": "white"
+  "navigationBarBackgroundColor": "#FDFBF7",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#FDFBF7"
 }

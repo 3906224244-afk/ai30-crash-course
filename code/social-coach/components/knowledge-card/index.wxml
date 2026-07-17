@@ -27,6 +27,7 @@
   <view class="card-footer">
     <text class="source-text">📌 来源：{{source}}</text>
     <view class="ack-btn" bindtap="onAcknowledge">
+      <image class="btn-bg-img" src="/images/btn-small-bg.png" mode="aspectFill" />
       <text>知道了</text>
     </view>
   </view>

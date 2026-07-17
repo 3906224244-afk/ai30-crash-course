@@ -3,8 +3,8 @@
  *
  * 微信AI调用入口。接收用户场景信息，分阶段返回：
  *   split    → 分流卡片（急需答案 / 提前录入）
- *   ask      → 追问卡片（ABC+D选择 + 最后自由补充）  [DeepSeek + 硬编码fallback]
- *   generate → 3-5条策略卡片                        [DeepSeek + 硬编码fallback]
+ *   ask      → 第一轮自由叙述 + 后续选择题追问（最多4题）[DeepSeek + RAG + 硬编码fallback]
+ *   generate → 3-5条策略卡片（流式输出）              [DeepSeek + RAG + 硬编码fallback]
  *
  * 返回格式严格遵循微信AI规范："事实 + 动作"两段式
  * - fact:  AI当上下文地基读取
@@ -13,20 +13,40 @@
 
 var deepseek = require('./deepseek.js');
 var prompts = require('./prompts.js');
+var rag = require('./rag.js');
 
-// ========== 知识库（MVP阶段内嵌，后续迁移到向量检索） ==========
+// ========== 工具定义（Function Calling） ==========
 
-var KNOWLEDGE = {
-  etiquette: {
-    '随份子': '深圳/广州普通同事200-400元，好朋友600-1000元。广东一般不收，给了也会回。北京/上海普通同事300-500元。二线200-300元。关键看关系和收入。',
-    '敬酒': '互联网/外企：氛围轻松，说"感谢帮助"即可。体制内：注重座次顺序，先敬最高领导。见家长：双手举杯，杯沿低于对方。',
-    '送礼': '第一次见家长：茶叶+水果，预算500-1500。不要送钟/伞/梨/鞋。投其所好比贵更重要。'
-  },
-  strategy: {
-    '拒绝': '核心三法：①主动哭穷（我手头也紧）②模糊拖延（钱在理财里取不出）③设硬边界（我不跟朋友借钱）。不要问"借多少"——一问就给对方讨价空间。',
-    '道歉': '轻度：当场道歉简洁直接。中度：单独沟通+补救方案。严重：三步走——①私下道歉不解释②给补救方案③等情绪平复后重建关系。禁忌：道歉时不说"但是"。',
-    '职场沟通': '催进度回复：①先表达在努力②说明客观原因③给出明确时间④请求反馈。核心：让对方觉得你在积极推进而非拖延。'
+var TOOLS = [
+  {
+    type: 'function',
+    function: {
+      name: 'searchKnowledge',
+      description: '检索人情世故知识库，获取与当前社交场景相关的结构化规则（condition → implication → tactical_note → avoid）。在追问阶段用于判断该问什么，在策略生成阶段用于获取具体策略规则。',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: '描述当前场景的中文关键词或短句，如"导师催论文 延期"、"暧昧对象已读不回 刚认识"'
+          },
+          kbType: {
+            type: 'string',
+            enum: ['ask', 'generate'],
+            description: '检索目标知识库。ask库含追问维度规则（该问什么），generate库含策略生成规则（怎么回）。Ask阶段优先调ask库，Generate阶段优先调generate库。'
+          }
+        },
+        required: ['query', 'kbType']
+      }
+    }
   }
+];
+
+// ========== 知识库（已废弃 — RAG 检索替代，保留作为 fallback 的最低兜底） ==========
+
+var FALLBACK_ETIQUETTE = {
+  '随份子': '深圳/广州普通同事200-400元，好朋友600-1000元。关键看关系和收入。',
+  '敬酒': '互联网/外企：说"感谢帮助"即可。体制内：注意座次。见家长：双手举杯，杯沿低于对方。'
 };
 
 // ========== 硬编码：信息缺口分析（LLM失败时fallback） ==========
@@ -265,8 +285,11 @@ function buildCounterQuestion(context, type) {
 // ========== DeepSeek API 调用封装 ==========
 
 function safeParseJSON(raw) {
+  // 剥离 markdown 代码块包裹（```json ... ```）
+  var stripped = raw.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '');
+  try { return JSON.parse(stripped); } catch (e) { /* continue */ }
   try { return JSON.parse(raw); } catch (e) { /* continue */ }
-  var match = raw.match(/\{[\s\S]*\}/);
+  var match = (stripped.match(/\{[\s\S]*\}/) || raw.match(/\{[\s\S]*\}/));
   if (match) {
     try { return JSON.parse(match[0]); } catch (e) { /* continue */ }
   }
@@ -303,20 +326,119 @@ function buildGenerateUserMessage(situation, answers, profile) {
 }
 
 async function llmAnalyzeGaps(situation, answers) {
-  var userMsg = buildAskUserMessage(situation, answers);
-  try {
-    return safeParseJSON(await deepseek.chat(prompts.ASK_PROMPT, userMsg));
-  } catch (e) {
-    return safeParseJSON(await deepseek.chat(prompts.ASK_PROMPT, userMsg));
+  // 1. 构建检索查询
+  var searchQuery = situation;
+  if (answers.length > 0) {
+    searchQuery += ' ' + answers.map(function(a) { return a.answer; }).join(' ');
   }
+
+  // 2. 预检索：Agent 自己查两个知识库（不等模型要）
+  var askRules = [];
+  var genRules = [];
+  try {
+    askRules = await rag.searchKnowledge(searchQuery, 'ask', 5);
+    console.log('Ask: 预检索 Ask KB →', askRules.length, '条规则');
+  } catch (e) {
+    console.log('Ask: 预检索 Ask KB 失败:', e.message);
+  }
+  try {
+    genRules = await rag.searchKnowledge(searchQuery, 'generate', 3);
+    console.log('Ask: 预检索 Generate KB →', genRules.length, '条规则');
+  } catch (e) {
+    console.log('Ask: 预检索 Generate KB 失败:', e.message);
+  }
+
+  // 3. 拼装知识库上下文，注入 prompt（用 compact 摘要，精简但不丢维度方向）
+  var knowledgeContext = '';
+  if (askRules.length > 0) {
+    knowledgeContext += '## 追问维度参考（知识库告诉你这类场景该问什么）\n';
+    askRules.forEach(function(r, i) {
+      knowledgeContext += (i + 1) + '. ' + (r.compact || r.tactical_note) + '\n';
+    });
+    knowledgeContext += '\n';
+  }
+  if (genRules.length > 0) {
+    knowledgeContext += '## 策略方向参考（知识库告诉你这类场景有哪些策略可用）\n';
+    genRules.forEach(function(r, i) {
+      knowledgeContext += (i + 1) + '. ' + (r.compact || r.tactical_note) + '\n';
+    });
+    knowledgeContext += '\n';
+  }
+  if (knowledgeContext.length === 0) {
+    knowledgeContext = '知识库中暂无匹配规则，请根据你的通用社交知识判断。\n\n';
+  }
+
+  // 4. 单次 API 调用（知识库已在 prompt 里，不需要 tool-loop）
+  var userMsg = knowledgeContext + buildAskUserMessage(situation, answers);
+
+  try {
+    var raw = await deepseek.chat(prompts.ASK_PROMPT, userMsg, { model: deepseek.FAST_MODEL, maxTokens: 4096 });
+    return safeParseJSON(raw);
+  } catch (e) {
+    console.log('Ask LLM 失败:', e.message);
+  }
+
+  // 失败返回 null，触发外层硬编码 fallback
+  return null;
 }
 
+/**
+ * Generate 阶段 LLM 调用（单轮直发，Agent 提前查好知识库）
+ *
+ * 自主检索 Ask KB + Generate KB 两个库，把所有信息拼进一个 prompt，一轮发给模型。
+ * 不需要工具调用循环——Agent 自己全查完。
+ */
 async function llmGenerateStrategies(situation, answers, profile) {
-  var userMsg = buildGenerateUserMessage(situation, answers, profile);
+  // 1. 构建检索查询（situation + 用户所有回答）
+  var searchQuery = situation;
+  if (answers.length > 0) {
+    searchQuery += ' ' + answers.map(function(a) { return a.answer; }).join(' ');
+  }
+
+  // 2. 查 Generate KB（策略规则）
+  var genRules = [];
   try {
-    return safeParseJSON(await deepseek.chat(prompts.GENERATE_PROMPT, userMsg, { maxTokens: 3072 }));
+    genRules = await rag.searchKnowledge(searchQuery, 'generate', 5);
+    console.log('Generate: 检索 Generate KB →', genRules.length, '条规则');
   } catch (e) {
-    return safeParseJSON(await deepseek.chat(prompts.GENERATE_PROMPT, userMsg, { maxTokens: 3072 }));
+    console.log('Generate: 检索 Generate KB 失败:', e.message);
+  }
+
+  // 2. 拼装 knowledge context（只查 Generate KB，Ask 阶段的成果已在 answers 里）
+  var knowledgeContext = '';
+
+  if (genRules.length > 0) {
+    knowledgeContext += '## 策略生成规则（基于以下规则，使用其中的策略方向和雷区）\n';
+    genRules.forEach(function(r, i) {
+      knowledgeContext += (i + 1) + '. ' + (r.compact || r.tactical_note) + '\n';
+    });
+    knowledgeContext += '\n';
+  }
+
+  if (knowledgeContext.length === 0) {
+    knowledgeContext = '知识库中暂无匹配规则，请根据你的通用社交知识生成策略。\n\n';
+  }
+
+  // 3. 拼装 user message（知识库内容直接注入）
+  var userMsg = buildGenerateUserMessage(situation, answers, profile);
+  userMsg = knowledgeContext + userMsg;
+
+  // 4. 流式直发
+  try {
+    var lastLog = Date.now();
+    var raw = await deepseek.chatStream(prompts.GENERATE_PROMPT, userMsg, { maxTokens: 8192 }, function(chunk) {
+      // 每2秒汇报一次进度，避免刷屏
+      var now = Date.now();
+      if (now - lastLog > 2000) {
+        process.stdout.write('.');
+        lastLog = now;
+      }
+    });
+    console.log(''); // 换行
+    return safeParseJSON(raw);
+  } catch (e) {
+    console.log('Generate LLM 流式失败，重试:', e.message);
+    return safeParseJSON(await deepseek.chat(prompts.GENERATE_PROMPT, userMsg, { maxTokens: 8192 }));
   }
 }
 
@@ -335,7 +457,8 @@ exports.main = async function (event, context) {
     } else if (answers.length === 0) {
       phase = 'ask';
     } else {
-      phase = (answers.length < 4) ? 'ask' : 'generate';
+      // 1轮自由叙述 + 最多4轮选择题 = 最多5轮追问
+      phase = (answers.length < 5) ? 'ask' : 'generate';
     }
   }
 
@@ -357,55 +480,71 @@ exports.main = async function (event, context) {
 
   // ===== ASK 阶段（LLM + 硬编码fallback） =====
   if (phase === 'ask') {
-    // 尝试 LLM
-    var llmUsed = false;
-    try {
-      var llmResult = await llmAnalyzeGaps(situation, answers);
 
-      if (llmResult && llmResult.needMoreInfo === false) {
-        phase = 'generate';
-        llmUsed = true;
-      } else if (llmResult && llmResult.questions && llmResult.questions.length > 0) {
-        llmUsed = true;
-        var qIndex = answers.length;
-        var question = llmResult.questions[qIndex];
-
-        if (!question || qIndex >= llmResult.questions.length) {
-          phase = 'generate';
-        } else if (question.type === 'free') {
-          return {
-            fact: '已收集' + answers.length + '轮信息。进入自由补充阶段。',
-            action: '展示自由补充卡片。用户提交或跳过后，调用本工具phase=generate。',
-            card: {
-              type: 'question', questionType: 'free',
-              questionIndex: answers.length + 1,
-              totalQuestions: llmResult.questions.length,
-              text: question.text || '还有什么想让我知道的？',
-              directionHints: question.directionHints || [],
-              isLast: true
-            }
-          };
-        } else {
-          return {
-            fact: '正在收集信息。已收集' + answers.length + '轮。当前追问：' + (question.text || '').substring(0, 30) + '...',
-            action: '展示追问卡片。用户选择后继续调用本工具，phase=ask。',
-            card: {
-              type: 'question', questionType: 'choice',
-              questionIndex: answers.length + 1,
-              totalQuestions: llmResult.questions.length,
-              text: question.text,
-              options: question.options || [],
-              isLast: (qIndex >= llmResult.questions.length - 1)
-            }
-          };
+    // ----- 第一轮：自由叙述 -----
+    // 用户刚输入场景描述（可能只有一句话），先让ta自由叙述完整情况。
+    // 不调 LLM——等用户把故事讲完，后续选择题追问才有高质量上下文。
+    if (answers.length === 0) {
+      return {
+        fact: '用户已输入初步场景：' + (situation || '').substring(0, 100) + '。引导自由叙述完整情况。',
+        action: '展示自由叙述卡片。用户提交后继续追问（phase=ask）。',
+        card: {
+          type: 'question', questionType: 'free',
+          questionIndex: 1,
+          totalQuestions: 5,   // 1轮自由叙述 + 最多4轮选择题
+          text: '把你知道的都告诉我吧——越详细越好。想到什么说什么，不用组织语言。',
+          directionHints: [
+            '对方是什么样的人（性格、职位、跟你的关系）',
+            '具体发生了什么（时间、地点、说了什么、怎么说的）',
+            '你最担心什么后果？之前有没有类似的事？',
+            '有什么绝对不能做或不能说的',
+            '你希望达到的最好结果是什么'
+          ],
+          isLast: false
         }
+      };
+    }
+
+    // ----- 第二轮起：选择题追问 -----
+    // 用户已通过自由叙述提供了详细背景。现在调 LLM 分析缺口，生成精准选择题。
+    // 固定 5 题（1 自由 + 4 选择），第 5 题答完才切 Generate。
+    var CHOICE_COUNT = 4;  // 自由叙述后固定 4 道选择题
+    var choiceIndex = answers.length - 1;  // 当前是第几道选择题（0-based）
+
+    var llmUsed = false;
+    if (choiceIndex < CHOICE_COUNT) {
+      try {
+        var llmResult = await llmAnalyzeGaps(situation, answers);
+
+        if (llmResult && llmResult.questions && llmResult.questions.length > 0) {
+          // 从 LLM 返回的题目中取当前索引。LLM 不够 4 道时，剩余用硬编码补
+          var question = llmResult.questions[choiceIndex];
+          if (question) {
+            llmUsed = true;
+            var isLast = choiceIndex >= CHOICE_COUNT - 1;
+            return {
+              fact: '已收集' + answers.length + '轮信息。当前追问：' + (question.text || '').substring(0, 30) + '...',
+              action: '展示追问卡片。用户选择后继续调用本工具，phase=ask。',
+              card: {
+                type: 'question', questionType: 'choice',
+                questionIndex: answers.length + 1,
+                totalQuestions: 5,
+                text: question.text,
+                options: question.options || [],
+                isLast: isLast
+              }
+            };
+          }
+          // LLM 返回了题但不够 → llmUsed 保持 false，走硬编码补位
+        }
+      } catch (e) {
+        console.log('LLM ask failed, fallback to hardcoded:', (e && e.message));
       }
-    } catch (e) {
-      console.log('LLM ask failed, fallback to hardcoded:', (e && e.message));
     }
 
     // Fallback: 硬编码（LLM 失败或返回空时走这里）
-    if (!llmUsed || phase !== 'generate') {
+    // 同样固化 5 题：1 自由叙述 + 4 道选择题
+    if (!llmUsed && choiceIndex < CHOICE_COUNT) {
       var gaps = analyzeGaps(situation, answers);
       var askedKeys = {};
       answers.forEach(function (a) {
@@ -417,41 +556,33 @@ exports.main = async function (event, context) {
       });
       var freshGaps = gaps.filter(function (g) { return !askedKeys[g.key]; });
 
-      if (freshGaps.length === 0) {
-        phase = 'generate';
+      // 用新鲜 gap，不够则循环复用（确保始终有题可出）
+      var currentGap;
+      if (freshGaps.length > 0) {
+        currentGap = freshGaps[0];
       } else {
-        var currentGap = freshGaps[0];
-        var isLastGap = freshGaps.length === 1;
-
-        if (isLastGap) {
-          return {
-            fact: '已收集多轮信息。当前为最后一轮追问。',
-            action: '展示自由补充卡片。用户提交或跳过后，phase=generate。',
-            card: {
-              type: 'question', questionType: 'free',
-              questionIndex: answers.length + 1,
-              totalQuestions: answers.length + 1,
-              text: '还有什么想让我知道的？',
-              directionHints: ['对方性格（吃软还是吃硬）', '之前跟对方有没有过节', '你最担心的后果是什么', '有没有共同朋友在场', '什么绝对不能做或说', '你们平时的关系怎么样'],
-              isLast: true
-            }
-          };
-        }
-
-        return {
-          fact: '正在收集信息。当前追问维度：' + currentGap.key + '。',
-          action: '展示追问卡片。用户选择后继续调用本工具，phase=ask。',
-          card: {
-            type: 'question', questionType: 'choice',
-            questionIndex: answers.length + 1,
-            totalQuestions: answers.length + freshGaps.length,
-            text: currentGap.text,
-            options: currentGap.options,
-            isLast: false
-          }
-        };
+        // 全部问完一轮，循环复用第一道
+        currentGap = gaps[0];
       }
+
+      var isLast = choiceIndex >= CHOICE_COUNT - 1;
+
+      return {
+        fact: '正在收集信息（硬编码fallback）。当前追问维度：' + currentGap.key + '。',
+        action: '展示追问卡片。用户选择后继续调用本工具，phase=ask。',
+        card: {
+          type: 'question', questionType: 'choice',
+          questionIndex: answers.length + 1,
+          totalQuestions: 5,
+          text: currentGap.text,
+          options: currentGap.options,
+          isLast: isLast
+        }
+      };
     }
+
+    // 选择题已问够 4 道（总 5 题），切到 Generate 阶段
+    phase = 'generate';
   }
 
   // ===== GENERATE 阶段（LLM + 硬编码fallback） =====
@@ -528,3 +659,5 @@ exports.main = async function (event, context) {
     }
   };
 };
+
+exports.safeParseJSON = safeParseJSON;

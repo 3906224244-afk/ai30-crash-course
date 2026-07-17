@@ -1,61 +1,309 @@
-/* 全局样式 */
+/* ================================================================
+   Paper Sketch 设计令牌 — 奶油纸 + 手绘简笔画
+   底色温暖、线条干净、硬阴影、克制暖琥珀
+   ================================================================ */
+
+page {
+  /* ── 背景 ── */
+  --bg-primary: #FDFBF7;
+  --bg-card: #FFFFFF;
+  --bg-card-muted: #F8F4ED;
+  --bg-warm: #FEF9F0;
+
+  /* ── 强调：暖琥珀（克制使用） ── */
+  --accent: #D97706;
+  --accent-hover: #B85C00;
+  --accent-ghost: #FEF5E7;
+  --accent-warm: #E8D5A3;
+
+  /* ── 文字：铅笔黑系 ── */
+  --text-primary: #2D2D2D;
+  --text-secondary: #6B6B6B;
+  --text-tertiary: #999999;
+
+  /* ── 边框：暖灰 ── */
+  --border: #E0D8CC;
+  --border-light: #EDE8E0;
+
+  /* ── 阴影：硬偏移无模糊（手绘核心特征） ── */
+  --shadow-hard: 4px 4px 0 #2D2D2D;
+  --shadow-hard-sm: 3px 3px 0 #2D2D2D;
+  --shadow-soft: 2px 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* ── 圆角：不对称手绘感（四角不一） ── */
+  --radius-sm: 6rpx 10rpx 8rpx 12rpx;
+  --radius-md: 14rpx 22rpx 10rpx 20rpx;
+  --radius-lg: 20rpx 28rpx 16rpx 26rpx;
+  --radius-xl: 24rpx 36rpx 20rpx 32rpx;
+
+  /* ── 间距 ── */
+  --space-1: 8rpx;
+  --space-2: 16rpx;
+  --space-3: 24rpx;
+  --space-4: 32rpx;
+  --space-5: 40rpx;
+  --space-6: 48rpx;
+  --space-8: 64rpx;
+
+  /* ── 过渡 ── */
+  --transition: 0.12s ease;
+}
+
+
+/* ================================================================
+   全局样式
+   ================================================================ */
+
 page {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
     "Helvetica Neue", sans-serif;
   font-size: 28rpx;
-  color: #333;
-  background-color: #f5f5f5;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.5rpx;
 }
 
-/* 通用按钮 */
-.btn-primary {
-  background: linear-gradient(135deg, #e94560, #c23152);
-  color: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx 48rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-  border: none;
-  text-align: center;
-  display: inline-block;
-}
-.btn-primary:active {
-  opacity: 0.85;
-}
+/* ================================================================
+   手绘按钮
+   ================================================================ */
 
-.btn-secondary {
-  background: #fff;
-  color: #e94560;
-  border: 2rpx solid #e94560;
-  border-radius: 16rpx;
-  padding: 24rpx 48rpx;
-  font-size: 32rpx;
-  text-align: center;
-  display: inline-block;
-}
-
-/* 卡片 */
-.card {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 32rpx;
-  margin: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
-}
-
-/* 输入框 */
-.input-area {
+/* 按钮背景图层 — 通用 */
+.btn-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  min-height: 160rpx;
-  background: #f8f8f8;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  font-size: 30rpx;
-  box-sizing: border-box;
-  border: 2rpx solid transparent;
-  transition: border-color 0.3s;
+  height: 100%;
+  z-index: 0;
 }
-.input-area:focus {
-  border-color: #e94560;
-  background: #fff;
+
+/* 主按钮 — 手绘背景图 + 硬阴影 + 按压位移 */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 22rpx 56rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  box-shadow: none;
+  transform: translate(0, 0) rotate(-0.3deg);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-primary .btn-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.btn-primary text,
+.btn-primary > view {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-primary:active {
+  transform: translate(4px, 4px) rotate(-0.3deg);
+  box-shadow: 0 0 0 #2D2D2D;
+}
+
+/* 次按钮 — 手绘白底背景图 + 硬阴影 */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 22rpx 56rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  box-shadow: 4px 4px 0 #2D2D2D;
+  transform: translate(0, 0) rotate(0.3deg);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-secondary .btn-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.btn-secondary text,
+.btn-secondary > view {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-secondary:active {
+  transform: translate(4px, 4px) rotate(0.3deg);
+  box-shadow: 0 0 0 #2D2D2D;
+}
+
+/* 小按钮 — 手绘背景图 */
+.btn-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 10rpx 28rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  box-shadow: none;
+  transform: translate(0, 0) rotate(0.2deg);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-small .btn-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.btn-small text,
+.btn-small > view {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-small:active {
+  transform: translate(3px, 3px) rotate(0.2deg);
+  box-shadow: 0 0 0 #2D2D2D;
+}
+
+/* 文字按钮 — 无阴影，仅下划线 */
+.btn-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  padding: 12rpx 0;
+  border-bottom: 1.5px dashed var(--border);
+  display: inline-block;
+}
+
+/* ================================================================
+   手绘卡片
+   ================================================================ */
+
+/* 基础卡片 — 白底浮在奶油上 + 硬阴影 */
+.card {
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 22rpx 30rpx 16rpx 28rpx;
+  padding: var(--space-4);
+  box-shadow: none;
+}
+
+/* 便签卡片 — 微旋转 + 硬阴影（核心卡片风格） */
+.card-sticky {
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 24rpx 32rpx 18rpx 28rpx;
+  padding: var(--space-4);
+  box-shadow: none;
+  transform: rotate(-0.4deg);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.card-sticky:active {
+  transform: rotate(-0.4deg) translate(3px, 3px);
+  box-shadow: 0 0 0 #2D2D2D;
+}
+
+/* 暖色卡片 — 暖黄底 */
+.card-warm {
+  background: var(--accent-ghost);
+  border: 1.5px solid var(--accent-warm);
+  border-radius: 20rpx 28rpx 14rpx 26rpx;
+  padding: var(--space-4);
+}
+
+/* ================================================================
+   分割线
+   ================================================================ */
+
+/* 虚线分隔 — 撕纸线 */
+.divider-dashed {
+  border: none;
+  border-top: 1.5px dashed var(--border);
+  margin: var(--space-3) 0;
+}
+
+/* 实线分隔 */
+.divider {
+  border: none;
+  border-top: 1.5px solid var(--border-light);
+  margin: var(--space-3) 0;
+}
+
+/* ================================================================
+   标签
+   ================================================================ */
+
+/* 手绘标签 — 暖黄椭圆底 */
+.tag {
+  display: inline-block;
+  font-size: 22rpx;
+  color: var(--text-primary);
+  background: var(--accent-warm);
+  border: 1px solid #2D2D2D;
+  border-radius: var(--radius-xl);
+  padding: 4rpx 18rpx;
+  letter-spacing: 0.5rpx;
+}
+
+/* 标签小点 */
+.tag-dot {
+  display: inline-block;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 6rpx;
+  vertical-align: middle;
+}
+
+/* ================================================================
+   动画
+   ================================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease;
+}
+
+.pop-in {
+  animation: popIn 0.2s ease;
 }

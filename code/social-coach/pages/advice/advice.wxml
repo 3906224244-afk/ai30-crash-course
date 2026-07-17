@@ -1,42 +1,92 @@
-<!-- 咨询页：场景描述 → 追问 → 5条策略 -->
+<!-- 咨询页 — 手绘便签对话流 -->
 <view class="container">
 
-  <!-- Step 0: 场景输入 -->
+  <!-- ====== Step 0: 入口 ====== -->
   <view class="step" wx:if="{{step === 0}}">
-    <view class="step-header">
-      <text class="step-icon">💬</text>
-      <text class="step-title">说说你的情况</text>
-      <text class="step-sub">描述越具体，建议越精准</text>
-    </view>
-    <textarea
-      class="situation-input"
-      placeholder="比如：导师让我这周改完论文但来不及了，怎么回复他..."
-      value="{{situation}}"
-      bindinput="onSituationInput"
-      auto-height
-      maxlength="-1"
-    />
-    <view class="quick-examples">
-      <text class="example-label">💡 可以这么说：</text>
-      <view class="example-tags">
-        <text class="tag" bindtap="fillExample" data-text="导师催论文怎么回">导师催论文怎么回</text>
-        <text class="tag" bindtap="fillExample" data-text="同事让我帮忙，不想答应">同事让我帮忙，不想答应</text>
-        <text class="tag" bindtap="fillExample" data-text="相亲对象约我，不想去">相亲对象约我，不想去</text>
-        <text class="tag" bindtap="fillExample" data-text="朋友借钱怎么拒绝">朋友借钱怎么拒绝</text>
-        <text class="tag" bindtap="fillExample" data-text="领导请客怎么敬酒">领导请客怎么敬酒</text>
+    <view class="entry">
+      <image class="entry-illust" src="/images/hero-report.svg" mode="aspectFit" />
+      <text class="entry-heading">说说你遇到的<text class="entry-heading-accent">人际难题</text></text>
+      <text class="entry-desc">不用组织语言，想到什么说什么。我会帮你理清局面，给你不同角度的应对思路。</text>
+      <view class="btn-primary entry-btn-full" bindtap="startConversation">
+        <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
+        <text>开始聊聊</text>
+      </view>
+      <view class="entry-profile" wx:if="{{!hasProfile}}" bindtap="goProfile">
+        <text>建个人设，聊起来更懂你 →</text>
+      </view>
+
+      <!-- 底部装饰涂鸦 -->
+      <view class="entry-deco">
+        <image class="deco-scribble" src="/images/deco-scribbles.svg" mode="aspectFit" />
+        <image class="deco-star" src="/images/deco-stars.svg" mode="aspectFit" />
       </view>
     </view>
-    <button class="btn-primary" bindtap="submitSituation">
-      开始分析 →
-    </button>
   </view>
 
-  <!-- Step 1: 追问轮 → 使用 question-card 原子组件 -->
+  <!-- ====== Step 1: 对话流 ====== -->
   <view class="step" wx:if="{{step === 1}}">
+
+    <!-- 等待中 -->
+    <view class="chat-waiting" wx:if="{{questionType === 'waiting'}}">
+      <view class="waiting-dot-row">
+        <view class="w-dot"></view>
+        <view class="w-dot"></view>
+        <view class="w-dot"></view>
+      </view>
+      <text class="waiting-text">正在分析你的情况</text>
+    </view>
+
+    <!-- 自由叙述 -->
+    <view class="chat-free" wx:if="{{questionType === 'free'}}">
+      <view class="chat-progress">
+        <text class="cp-text">第 {{currentQIndex + 1}} / {{totalQuestions}} 题</text>
+        <view class="cp-bar">
+          <view class="cp-fill" style="width: {{(currentQIndex + 1) / totalQuestions * 100}}%;"></view>
+        </view>
+      </view>
+
+      <text class="chat-prompt">{{questions[currentQIndex].text}}</text>
+
+      <!-- 场景chips — 仅首题 -->
+      <view class="scene-row" wx:if="{{currentQIndex === 0 && questions[0].type === 'free'}}">
+        <text class="scene-hint">选一个场景（可不选）</text>
+        <view class="scene-chips">
+          <text
+            wx:for="{{sceneChips}}"
+            wx:key="id"
+            class="scene-chip {{item.active ? 'chip-on' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onChipTap"
+          >{{item.label}}</text>
+        </view>
+      </view>
+
+      <textarea
+        class="chat-input"
+        placeholder="在这说说你的故事……"
+        value="{{freeText}}"
+        auto-height
+        maxlength="500"
+        bindinput="onFreeInput"
+        focus="{{step === 1 && questionType === 'free'}}"
+      />
+
+      <view class="chat-submit {{freeText ? '' : 'submit-off'}}" bindtap="onSubmitFree">
+        <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
+        <text>{{isLastQuestion ? '查看结果' : '下一题'}}</text>
+      </view>
+
+      <view class="chat-back" bindtap="backToStart">
+        <text>← 返回</text>
+      </view>
+    </view>
+
+    <!-- 选择题 — 手绘便签式 -->
     <question-card
+      wx:if="{{questionType === 'choice'}}"
       questionType="{{questions[currentQIndex].type}}"
       questionIndex="{{currentQIndex + 1}}"
-      totalQuestions="{{questions.length}}"
+      totalQuestions="{{totalQuestions}}"
       text="{{questions[currentQIndex].text}}"
       options="{{questions[currentQIndex].options}}"
       directionHints="{{directionHints}}"
@@ -46,31 +96,35 @@
     />
   </view>
 
-  <!-- Step 2: 分析中 -->
+  <!-- ====== Step 2: 等待 ====== -->
   <view class="step" wx:if="{{step === 2}}">
-    <view class="loading-area">
-      <text class="loading-icon">🧠</text>
-      <text class="loading-text">正在分析你的情况...</text>
-      <view class="loading-dots">
-        <view class="dot"></view>
-        <view class="dot"></view>
-        <view class="dot"></view>
+    <view class="gen-waiting">
+      <image class="gen-illust" src="/images/hero-dinner.svg" mode="aspectFit" />
+      <text class="gen-text">正在为你梳理策略</text>
+      <text class="gen-sub">结合你的情况和知识库，整理最匹配的应对思路</text>
+      <view class="gen-bar">
+        <view class="gen-bar-fill"></view>
       </view>
     </view>
   </view>
 
-  <!-- Step 3: 5条策略结果 → 使用 strategy-list-card 原子组件 -->
+  <!-- ====== Step 3: 结果 ====== -->
   <view class="step" wx:if="{{step === 3}}">
     <strategy-list-card
       contextLabel="{{contextLabel}}"
-      guideTitle="怎么选？先看这张表"
-      guideIntro="下面5条不是同一种意思的5种说法，而是5条完全不同的路。每条路走下去，对方的反应和后续走向都不一样。"
+      guideTitle="帮你准备了这几种思路"
+      guideIntro="下面每条是不同的应对方式，不是同一种意思的不同说法。每条走的路不一样，对方的反应和后续走向也完全不一样。"
       guideQuickRef="{{guideQuickRef}}"
-      guideTip="💡 不确定选哪个？先看每条的风险提示，排除你不能承担的。"
+      guideTip="不确定选哪个？先看每条的风险提示，排除你不能承担的。"
       strategies="{{strategies}}"
       bind:copy="onStrategyCopy"
     />
-    <button class="btn-secondary reset-btn" bindtap="resetAdvice">🔄 换一个场景咨询</button>
+    <view class="reset-row">
+      <view class="btn-secondary reset-btn-full" bindtap="resetAdvice">
+        <image class="btn-bg-img" src="/images/btn-secondary-bg.png" mode="aspectFill" />
+        <text>再说说别的</text>
+      </view>
+    </view>
   </view>
 
 </view>

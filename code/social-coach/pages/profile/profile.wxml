@@ -1,60 +1,124 @@
-<!-- 前置录入：建立人设档案 -->
-<view class="container">
+<!-- 我的 — 手账便签拼贴 -->
+<scroll-view class="page-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+  <view class="container">
 
-  <view class="step-header">
-    <text class="step-icon">📝</text>
-    <text class="step-title">建立你的人设档案</text>
-    <text class="step-sub">大约1-2分钟，以后每次咨询都会更懂你</text>
-  </view>
-
-  <view class="progress-bar">
-    <view class="progress-fill" style="width: {{(currentStep / totalSteps) * 100}}%"></view>
-  </view>
-
-  <view class="question-card">
-    <text class="q-label">第{{currentStep}}题 / 共{{totalSteps}}题</text>
-    <text class="q-text">{{questions[currentStep-1].text}}</text>
-
-    <view wx:if="{{questions[currentStep-1].type === 'choice'}}">
-      <view class="q-options">
-        <view
-          wx:for="{{questions[currentStep-1].options}}"
-          wx:key="label"
-          class="q-option {{item.selected ? 'selected' : ''}}"
-          data-index="{{index}}"
-          bindtap="selectOption"
-        >
-          <text class="option-label">{{item.label}}</text>
-          <text class="option-text">{{item.text}}</text>
+    <!-- ===== 1. 人设档案卡 ===== -->
+    <view class="persona-card {{hasProfile ? '' : 'persona-empty'}}">
+      <view class="persona-header">
+        <image class="persona-avatar" src="/images/ui-persona.svg" mode="aspectFit" />
+        <view class="persona-info">
+          <text class="persona-name">{{userName}}</text>
+          <text class="persona-label" wx:if="{{hasProfile}}">{{personaSummary}}</text>
+          <text class="persona-label persona-label-dim" wx:else>轻点建立人设</text>
         </view>
+        <image class="persona-edit-icon" src="/images/ui-edit.svg" mode="aspectFit" bindtap="goEditProfile" />
       </view>
-      <view class="q-custom" wx:if="{{showCustomInput}}">
-        <text class="custom-label">✍️ 用你自己的话描述：</text>
-        <textarea class="custom-input" placeholder="输入你的回答..." value="{{customAnswer}}" bindinput="onCustomInput" />
-      </view>
-    </view>
 
-    <view wx:if="{{questions[currentStep-1].type === 'free'}}">
-      <view class="direction-table">
-        <text class="direction-title">📋 参考方向（想到了就填，不强制）</text>
-        <view class="direction-grid">
-          <view class="direction-item" wx:for="{{directionHints}}" wx:key="*this">
-            <text>{{item}}</text>
+      <!-- 有人设时展示详情 -->
+      <view class="persona-detail" wx:if="{{hasProfile && profileData}}">
+        <view class="persona-fields">
+          <view class="p-field" wx:if="{{profileData.lifeStage}}">
+            <text class="p-field-label">人生阶段</text>
+            <text class="p-field-value">{{profileData.lifeStage}}</text>
+          </view>
+          <view class="p-field" wx:if="{{profileData.traits}}">
+            <text class="p-field-label">性格特点</text>
+            <text class="tag">{{profileData.traits}}</text>
+          </view>
+          <view class="p-field" wx:if="{{profileData.frequentScenes}}">
+            <text class="p-field-label">常见场景</text>
+            <view class="scene-tags">
+              <text class="tag" wx:for="{{profileData.frequentScenes}}" wx:key="*this">{{item}}</text>
+            </view>
           </view>
         </view>
+        <text class="persona-edit-link" bindtap="goEditProfile">编辑人设 →</text>
       </view>
-      <view class="q-free-area">
-        <textarea class="free-input" placeholder="比如：你的身份、重要的关系...（可跳过）" value="{{customAnswer}}" bindinput="onCustomInput" auto-height />
+
+      <!-- 没人设时显示引导 -->
+      <view class="persona-guide" wx:if="{{!hasProfile}}" bindtap="goEditProfile">
+        <text class="guide-text">花1分钟建立你的人设档案，以后每次咨询都更精准</text>
+        <view class="btn-secondary guide-btn">
+          <image class="btn-bg-img" src="/images/btn-secondary-bg.png" mode="aspectFill" />
+          <text>建立人设</text>
+        </view>
       </view>
     </view>
 
-    <view class="q-actions">
-      <view class="btn-secondary" wx:if="{{currentStep > 1}}" bindtap="prevStep">上一题</view>
-      <view class="btn-primary" bindtap="nextStep">{{currentStep === totalSteps ? '完成录入' : '下一题'}}</view>
+    <!-- ===== 2. 使用痕迹便签 ===== -->
+    <view class="section-card stats-card" wx:if="{{hasProfile}}">
+      <view class="section-head-row">
+        <image class="section-dot" src="/images/ui-clock.svg" mode="aspectFit" />
+        <text class="section-label">你的使用痕迹</text>
+      </view>
+      <view class="stats-row">
+        <view class="stat-item">
+          <text class="stat-num">{{stats.weeklyCount}}</text>
+          <text class="stat-label">过去7天咨询</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-num">{{stats.topScene || '--'}}</text>
+          <text class="stat-label">最常遇到</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-num">{{stats.totalStrategies}}</text>
+          <text class="stat-label">累计策略</text>
+        </view>
+      </view>
     </view>
 
-    <view class="skip-link" wx:if="{{currentStep === totalSteps}}">
-      <text bindtap="skipAll">暂时跳过，以后再说</text>
+    <!-- ===== 3. 收藏夹预览 ===== -->
+    <view class="section-card saved-card" wx:if="{{savedStrategies.length > 0}}">
+      <view class="section-head-row">
+        <image class="section-dot" src="/images/ui-star.svg" mode="aspectFit" />
+        <text class="section-label">收藏夹</text>
+      </view>
+      <view class="saved-list">
+        <view
+          class="saved-item"
+          wx:for="{{savedStrategies}}"
+          wx:key="id"
+          wx:if="{{index < 2}}"
+        >
+          <text class="saved-title">{{item.title}}</text>
+          <text class="saved-preview">{{item.preview}}</text>
+        </view>
+      </view>
+      <text class="view-all-link" wx:if="{{savedStrategies.length > 2}}" bindtap="goSaved">
+        查看全部 {{savedStrategies.length}} 条 →
+      </text>
     </view>
+
+    <!-- ===== 4. 每日一卡 ===== -->
+    <view class="daily-card">
+      <view class="section-head-row">
+        <text class="section-label">每日一卡</text>
+        <view class="refresh-btn" bindtap="refreshDaily">
+          <image class="refresh-icon" src="/images/ui-refresh.svg" mode="aspectFit" />
+        </view>
+      </view>
+      <view class="daily-sticky" wx:if="{{dailyTip}}">
+        <image class="daily-tape" src="/images/ui-tape.svg" mode="aspectFit" />
+        <text class="daily-text">{{dailyTip}}</text>
+      </view>
+      <view class="daily-empty" wx:else>
+        <text class="daily-empty-text">暂无数据</text>
+      </view>
+    </view>
+
+    <!-- ===== 5. 关于 ===== -->
+    <view class="section-card about-card">
+      <view class="section-head-row">
+        <image class="section-dot" src="/images/ui-about.svg" mode="aspectFit" />
+        <text class="section-label">关于人情世故顾问</text>
+        <text class="version-text">V1.2</text>
+      </view>
+      <text class="about-desc">为20-30岁年轻人提供定制化社交策略的AI助手。用魔法打败魔法。</text>
+    </view>
+
+    <view class="page-bottom"></view>
+
   </view>
-</view>
+</scroll-view>

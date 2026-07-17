@@ -1,228 +1,355 @@
+/* ===== 我的 — 手账便签拼贴 ===== */
+
+.page-scroll {
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding: 24rpx;
+  background: var(--bg-primary);
+  padding: 32rpx 28rpx 0;
 }
 
-.step-header {
-  text-align: center;
-  padding: 60rpx 0 32rpx;
+/* ========================================
+   1. 人设档案卡
+   ======================================== */
+
+.persona-card {
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 22rpx 30rpx 16rpx 28rpx;
+  padding: 32rpx;
+  box-shadow: 4px 4px 0 #2D2D2D;
+  transform: rotate(-0.35deg);
+  margin-bottom: 28rpx;
+  position: relative;
 }
 
-.step-icon {
-  font-size: 64rpx;
-  display: block;
-  margin-bottom: 16rpx;
-}
-
-.step-title {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #1a1a2e;
-  display: block;
-  margin-bottom: 8rpx;
-}
-
-.step-sub {
-  font-size: 26rpx;
-  color: #999;
-}
-
-/* 进度条 */
-.progress-bar {
-  width: 100%;
-  height: 8rpx;
-  background: #e8e8e8;
-  border-radius: 4rpx;
-  margin-bottom: 40rpx;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #e94560, #c23152);
-  border-radius: 4rpx;
-  transition: width 0.3s ease;
-}
-
-/* 问题卡片 */
-.question-card {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 40rpx;
-  margin-bottom: 32rpx;
-}
-
-.q-label {
-  font-size: 24rpx;
-  color: #e94560;
-  font-weight: 600;
-  margin-bottom: 16rpx;
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 2rpx;
-}
-
-.q-text {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #1a1a2e;
-  line-height: 1.5;
-  margin-bottom: 36rpx;
-  display: block;
-}
-
-.q-options {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
-.q-option {
-  padding: 24rpx;
-  border-radius: 16rpx;
-  border: 2rpx solid #e8e8e8;
-  display: flex;
-  align-items: flex-start;
-  gap: 16rpx;
-  transition: all 0.2s;
-}
-
-.q-option:active {
-  background: #fef2f2;
-  border-color: #e94560;
-}
-
-.q-option.selected {
-  background: #fef2f2;
-  border-color: #e94560;
-}
-
-.option-label {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
-  background: #f5f5f5;
+.persona-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #666;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
+}
+
+.persona-avatar {
+  width: 80rpx;
+  height: 80rpx;
   flex-shrink: 0;
 }
 
-.q-option.selected .option-label {
-  background: #e94560;
-  color: #fff;
-}
-
-.option-text {
-  font-size: 28rpx;
-  color: #333;
-  line-height: 1.5;
+.persona-info {
   flex: 1;
 }
 
-/* 自定义输入 */
-.q-custom {
-  margin-top: 16rpx;
-}
-
-.custom-label {
-  font-size: 26rpx;
-  color: #666;
+.persona-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-primary);
   display: block;
-  margin-bottom: 12rpx;
+  margin-bottom: 6rpx;
 }
 
-.custom-input {
-  width: 100%;
-  min-height: 160rpx;
-  background: #f8f8f8;
-  border-radius: 12rpx;
-  padding: 20rpx;
-  font-size: 28rpx;
-  box-sizing: border-box;
-  border: 2rpx solid #e8e8e8;
-}
-
-.custom-input:focus {
-  border-color: #e94560;
-  background: #fff;
-}
-
-/* 方向提示表格 */
-.direction-table {
-  margin-bottom: 24rpx;
-  padding: 24rpx;
-  background: #fafafa;
-  border-radius: 16rpx;
-  border: 2rpx dashed #e0e0e0;
-}
-
-.direction-title {
+.persona-label {
   font-size: 24rpx;
-  color: #888;
-  display: block;
+  color: var(--text-secondary);
+}
+
+.persona-label-dim {
+  color: var(--text-tertiary);
+}
+
+.persona-edit-icon {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+  opacity: 0.5;
+  padding: 8rpx;
+}
+
+/* 人设详情 */
+.persona-detail {
+  border-top: 1.5px dashed var(--border);
+  padding-top: 20rpx;
+}
+
+.persona-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
   margin-bottom: 16rpx;
 }
 
-.direction-grid {
+.p-field {
   display: flex;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 12rpx;
 }
 
-.direction-item {
-  background: #fff;
-  padding: 10rpx 20rpx;
-  border-radius: 24rpx;
-  font-size: 22rpx;
-  color: #888;
-  border: 1rpx solid #e8e8e8;
+.p-field-label {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  min-width: 120rpx;
 }
 
-/* 最后一题自由输入区 */
-.q-free-area {
-  margin-top: 8rpx;
+.p-field-value {
+  font-size: 26rpx;
+  color: var(--text-primary);
+  line-height: 1.5;
 }
 
-.free-input {
-  width: 100%;
-  min-height: 200rpx;
-  background: #fafafa;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  font-size: 28rpx;
-  box-sizing: border-box;
-  border: 2rpx dashed #e0e0e0;
-  transition: border-color 0.3s;
-}
-
-.free-input:focus {
-  border-color: #e94560;
-  border-style: solid;
-  background: #fff;
-}
-
-/* 操作 */
-.q-actions {
+.scene-tags {
   display: flex;
-  gap: 24rpx;
+  flex-wrap: wrap;
+  gap: 8rpx;
 }
 
-.q-actions > view {
+.persona-edit-link {
+  font-size: 24rpx;
+  color: var(--accent);
+  border-bottom: 1.5px dashed var(--accent-warm);
+  display: inline-block;
+}
+
+/* 没人设引导 */
+.persona-guide {
+  text-align: center;
+  border-top: 1.5px dashed var(--border);
+  padding-top: 24rpx;
+}
+
+.guide-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.guide-btn {
+  display: inline-flex;
+  width: 320rpx;
+  height: 80rpx;
+}
+
+/* ========================================
+   通用区块卡
+   ======================================== */
+
+.section-card {
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 18rpx 28rpx 14rpx 26rpx;
+  padding: 28rpx;
+  box-shadow: 3px 3px 0 #2D2D2D;
+  margin-bottom: 24rpx;
+  transform: rotate(0.35deg);
+}
+
+/* 使用痕迹 — 横线笔记本纸 */
+.section-card.stats-card {
+  background: repeating-linear-gradient(
+    var(--bg-card) 0, var(--bg-card) 44rpx,
+    var(--border-light) 44rpx, var(--border-light) 45rpx
+  );
+  border: 1.5px solid #2D2D2D;
+  border-radius: 16rpx 26rpx 20rpx 28rpx;
+  box-shadow: 3px 3px 0 #2D2D2D;
+  transform: rotate(-0.3deg);
+}
+
+/* 收藏夹 — 左边暖黄条 */
+.section-card.saved-card {
+  border-left: 6rpx solid var(--accent-warm);
+  border-radius: 0 24rpx 20rpx 0;
+  box-shadow: 3px 3px 0 #2D2D2D;
+  transform: rotate(0.25deg);
+}
+
+/* 关于 — 无边框纯文字 */
+.section-card.about-card {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 16rpx 4rpx;
+  transform: none;
+}
+
+.section-head-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-dot {
+  width: 36rpx;
+  height: 36rpx;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.section-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-primary);
   flex: 1;
 }
 
-.skip-link {
-  text-align: center;
-  margin-top: 32rpx;
+/* ========================================
+   2. 使用痕迹
+   ======================================== */
+
+.stats-row {
+  display: flex;
+  align-items: center;
 }
 
-.skip-link text {
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.stat-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+}
+
+.stat-divider {
+  width: 1.5px;
+  height: 48rpx;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ========================================
+   3. 收藏夹预览
+   ======================================== */
+
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.saved-item {
+  padding: 16rpx 20rpx;
+  background: var(--bg-card-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  border-left: 3rpx solid var(--accent-warm);
+}
+
+.saved-title {
   font-size: 26rpx;
-  color: #bbb;
-  padding: 12rpx 32rpx;
+  color: var(--text-primary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.saved-preview {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  display: block;
+}
+
+.view-all-link {
+  font-size: 24rpx;
+  color: var(--accent);
+  border-bottom: 1.5px dashed var(--accent-warm);
+}
+
+/* ========================================
+   4. 每日一卡
+   ======================================== */
+
+.daily-card {
+  margin-bottom: 24rpx;
+}
+
+.refresh-btn {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-icon {
+  width: 36rpx;
+  height: 36rpx;
+  opacity: 0.5;
+}
+
+.daily-sticky {
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 24rpx 34rpx 16rpx 28rpx;
+  padding: 32rpx;
+  box-shadow: 3px 3px 0 #2D2D2D;
+  transform: rotate(0.6deg);
+  position: relative;
+}
+
+.daily-tape {
+  position: absolute;
+  top: -12rpx;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 72rpx;
+  height: 26rpx;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.daily-text {
+  font-size: 30rpx;
+  color: var(--text-primary);
+  line-height: 1.8;
+  display: block;
+  font-style: italic;
+}
+
+.daily-empty {
+  text-align: center;
+  padding: 40rpx;
+}
+
+.daily-empty-text {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}
+
+/* ========================================
+   5. 关于
+   ======================================== */
+
+.version-text {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.about-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  display: block;
+}
+
+/* ===== 底部 ===== */
+.page-bottom {
+  height: 80rpx;
 }

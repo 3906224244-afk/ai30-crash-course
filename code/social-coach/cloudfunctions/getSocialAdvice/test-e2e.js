@@ -79,7 +79,7 @@ async function run() {
     var msg = buildAskUserMsg(myScene, history);
     var raw;
     try {
-      raw = await deepseek.chat(prompts.ASK_PROMPT, msg, { maxTokens: 1024 });
+      raw = await deepseek.chat(prompts.ASK_PROMPT, msg, { maxTokens: 4096 });
     } catch (e) {
       console.log('❌ API 失败: ' + e.message);
       return;
@@ -128,7 +128,7 @@ async function run() {
   var genMsg = buildGenerateMsg(myScene, history);
   var genRaw;
   try {
-    genRaw = await deepseek.chat(prompts.GENERATE_PROMPT, genMsg, { maxTokens: 2048 });
+    genRaw = await deepseek.chat(prompts.GENERATE_PROMPT, genMsg, { maxTokens: 4096 });
   } catch (e) {
     console.log('❌ API 失败: ' + e.message);
     return;

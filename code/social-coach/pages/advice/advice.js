@@ -1,25 +1,27 @@
-// 咨询页：使用原子组件渲染追问和策略结果
-// 原子组件在微信AI对话流中自动渲染卡片
-// 在开发者工具中通过属性绑定和事件回传模拟完整流程
+// 咨询页：温暖极简对话流
+// 优先走 dev server，失败 → 云函数，再失败 → 本地模板
+var DEV_URL = 'http://localhost:3001';
 
 Page({
   data: {
-    step: 0,              // 0=输入, 1=追问, 2=分析中, 3=结果
-    situation: '',
+    step: 0,
+    hasProfile: false,
+
+    // 场景chips
+    sceneChips: [
+      { id: 'workplace', label: '职场', active: false },
+      { id: 'school', label: '校园', active: false },
+      { id: 'romance', label: '亲密', active: false },
+      { id: 'family', label: '家庭', active: false }
+    ],
+    activeScene: '',
+
     questions: [],
     currentQIndex: 0,
     isLastQuestion: false,
-    directionHints: [
-      '对方性格（吃软还是吃硬）',
-      '之前跟对方有没有过节',
-      '你最担心的后果是什么',
-      '有没有共同朋友在场',
-      '什么绝对不能做/说',
-      '你们平时的关系是什么样的'
-    ],
+    directionHints: [],
     answers: [],
     strategies: [],
-    // strategy-list-card 所需数据
     contextLabel: '',
     guideQuickRef: [
       { label: '① 正向回应', desc: '接住对方 → 适合关系好、想推进', bg: 'positive-bg' },
@@ -27,41 +29,158 @@ Page({
       { label: '③ 反问转移', desc: '探底牌 → 争取时间、不确定对方意图', bg: 'reverse-bg' },
       { label: '④ 幽默破局', desc: '降温 → 尴尬场景、想轻松气氛', bg: 'humor-bg' },
       { label: '⑤ 直球表态', desc: '不绕 → 需要明确立场、不能再模糊', bg: 'direct-bg' }
-    ]
+    ],
+    totalQuestions: 5,
+    questionType: 'free',
+    showOptions: false,
+    freeText: '',
+    cloudAvailable: true
   },
 
-  /* ========== Step 0: 场景输入 ========== */
-
-  onSituationInput(e) {
-    this.setData({ situation: e.detail.value });
-  },
-
-  fillExample(e) {
-    this.setData({ situation: e.currentTarget.dataset.text });
-  },
-
-  submitSituation() {
-    const situation = this.data.situation.trim();
-    if (!situation) return;
-
-    const questions = this.generateQuestions(situation);
-
-    if (questions.length === 0) {
-      this.generateResults();
-    } else {
-      this.setData({
-        step: 1,
-        questions: questions,
-        currentQIndex: 0,
-        isLastQuestion: false,
-        answers: []
-      });
+  onLoad: function () {
+    var profile = wx.getStorageSync('userProfile');
+    if (profile && profile.lifeStage) {
+      this.setData({ hasProfile: true });
+    }
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 });
     }
   },
 
-  /* ========== 追问生成（与云函数 getSocialAdvice 逻辑一致） ========== */
+  onShow: function () {
+    var profile = wx.getStorageSync('userProfile');
+    this.setData({ hasProfile: !!(profile && profile.lifeStage) });
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 });
+    }
+  },
 
-  generateQuestions(situation) {
+  /* ========== 场景chips ========== */
+
+  onChipTap: function (e) {
+    var id = e.currentTarget.dataset.id;
+    var chips = this.data.sceneChips;
+    var activeScene = '';
+
+    chips.forEach(function (c) {
+      if (c.id === id) {
+        c.active = !c.active;
+        if (c.active) activeScene = c.id;
+      } else {
+        c.active = false;
+      }
+    });
+
+    this.setData({ sceneChips: chips, activeScene: activeScene });
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  /* ========== 自由文本 ========== */
+
+  onFreeInput: function (e) {
+    this.setData({ freeText: e.detail.value });
+  },
+
+  backToStart: function () {
+    this.resetAdvice();
+  },
+
+  onSubmitFree: function () {
+    var text = (this.data.freeText || '').trim();
+    var activeScene = this.data.activeScene;
+
+    if (!text && !activeScene) return;
+
+    // 进入等待态
+    this.setData({ questionType: 'waiting' });
+
+    var answer = text || '';
+    if (activeScene) {
+      var chip = this.data.sceneChips.find(function (c) { return c.id === activeScene; });
+      if (chip) answer = '【场景：' + chip.label + '】' + (text || '');
+    }
+
+    var q = this.data.questions[this.data.currentQIndex];
+    this._waitStart = Date.now();
+    this.advanceQuestion(q, answer);
+  },
+
+  /* ========== 开始聊聊 ========== */
+
+  startConversation: function () {
+    this.setData({
+      step: 1,
+      questionType: 'free',
+      questions: [{ type: 'free', text: '把你知道的都告诉我吧' }],
+      totalQuestions: 5,
+      sceneChips: this.data.sceneChips.map(function (c) {
+        return { id: c.id, label: c.label, icon: c.icon, color: c.color, active: false };
+      }),
+      activeScene: '',
+      freeText: ''
+    });
+  },
+
+  goProfile: function () {
+    wx.switchTab({ url: '/pages/profile/profile' });
+  },
+
+  /* ========== 云函数调用 ========== */
+
+  callCloud: function (name, data) {
+    var that = this;
+    return new Promise(function (resolve, reject) {
+      if (!wx.cloud || !that.data.cloudAvailable) {
+        return reject(new Error('云环境不可用'));
+      }
+      wx.cloud.callFunction({
+        name: name,
+        data: data,
+        success: function (res) { resolve(res.result); },
+        fail: function (err) {
+          console.log(name + ' 调用失败:', err.errMsg);
+          if (that.data.cloudAvailable) {
+            that.setData({ cloudAvailable: false });
+          }
+          reject(err);
+        }
+      });
+    });
+  },
+
+  /* ========== 开发服务器 ========== */
+
+  callDevServer: function (data) {
+    return new Promise(function (resolve, reject) {
+      wx.request({
+        url: DEV_URL + '/',
+        method: 'POST',
+        data: data,
+        header: { 'Content-Type': 'application/json' },
+        timeout: 120000,
+        success: function (res) {
+          if (res.statusCode === 200 && res.data) {
+            resolve(res.data);
+          } else {
+            reject(new Error('dev server returned ' + res.statusCode));
+          }
+        },
+        fail: function (err) {
+          console.log('Dev server 不可用:', err.errMsg);
+          reject(err);
+        }
+      });
+    });
+  },
+
+  getProfile: function () {
+    try { return wx.getStorageSync('userProfile') || {}; }
+    catch (e) { return {}; }
+  },
+
+  /* ========== 追问生成（本地 fallback） ========== */
+
+  generateQuestions: function (situation) {
     var hasRelation = /领导|导师|老板|同事|朋友|对象|暧昧|相亲|甲方|父母|亲戚|同学|师兄|师姐|学弟|学妹|同门/.test(situation);
     var hasOtherPersonality = /他.*很|她.*很|他.*性格|她.*性格|对方.*比较|对方.*很|他是|她是/.test(situation);
     var hasGoal = /拒绝|想要|想让|不想|希望|准备|争取|推迟|延期|解释|道歉|挽回|推进/.test(situation);
@@ -86,7 +205,7 @@ Page({
     if (!hasOtherPersonality) {
       qs.push({
         type: 'choice',
-        text: '对方是什么样的人？这个决定了你用什么方式跟他沟通最有效。',
+        text: '对方是什么样的人？这决定了用什么方式沟通最有效。',
         options: [
           { label: 'A', text: '比较严肃直接，公事公办型 — 别绕弯子' },
           { label: 'B', text: '表面和气但心里有数 — 话说得好听很重要' },
@@ -112,7 +231,7 @@ Page({
     if (!hasHistory && qs.length < 3) {
       qs.push({
         type: 'choice',
-        text: '你跟对方之前有过类似的情况吗？历史决定了这次该怎么出牌。',
+        text: '你跟对方之前有过类似的情况吗？',
         options: [
           { label: 'A', text: '第一次遇到这种情况 — 需要建立边界' },
           { label: 'B', text: '以前发生过，上次没处理好 — 这次要换个方式' },
@@ -135,95 +254,207 @@ Page({
       });
     }
 
-    // 最后一题：自由补充
-    qs.push({
-      type: 'free',
-      text: '还有什么想让我知道的？'
-    });
-
+    qs.push({ type: 'free', text: '还有什么想让我知道的？' });
     return qs;
   },
 
-  /* ========== Step 1: 追问轮 — 原子组件事件处理 ========== */
+  /* ========== 追问处理 ========== */
 
-  /** question-card submit 事件 */
-  onQuestionSubmit(e) {
-    const { questionIndex, label, answer } = e.detail;
-    const q = this.data.questions[this.data.currentQIndex];
-
-    this.advanceQuestion(q, label || answer);
+  onQuestionSubmit: function (e) {
+    var d = e.detail;
+    var q = this.data.questions[this.data.currentQIndex];
+    this.setData({ questionType: 'waiting' });
+    this._waitStart = Date.now();
+    this.advanceQuestion(q, d.label || d.answer);
   },
 
-  /** question-card skip 事件 */
-  onQuestionSkip(e) {
-    const q = this.data.questions[this.data.currentQIndex];
+  onQuestionSkip: function (e) {
+    var q = this.data.questions[this.data.currentQIndex];
     this.advanceQuestion(q, '跳过');
   },
 
-  /** 推进到下一题或生成结果 */
-  advanceQuestion(q, answer) {
-    const answers = [...this.data.answers, {
+  advanceQuestion: function (q, answer) {
+    var that = this;
+    var answers = this.data.answers.concat([{
       question: q.text,
       answer: answer || '跳过'
-    }];
+    }]);
 
-    const nextIndex = this.data.currentQIndex + 1;
-    if (nextIndex >= this.data.questions.length) {
-      this.setData({ answers, step: 2 });
-      setTimeout(() => this.generateResults(), 800);
+    var askData = {
+      situation: answers.length > 0 ? answers[0].answer : '',
+      answers: answers,
+      phase: 'ask',
+      profile: this.getProfile()
+    };
+
+    console.log('[advice] 调用 dev server...');
+    this.callDevServer(askData).then(function (result) {
+      console.log('[advice] dev server 返回:', result.card ? result.card.type : '?');
+      that.handleAskResult(result, answers);
+    }).catch(function (err) {
+      console.log('[advice] dev server 失败:', err.message || err.errMsg);
+      return that.callCloud('getSocialAdvice', askData);
+    }).then(function (result) {
+      if (result) {
+        console.log('[advice] 云函数返回:', result.card ? result.card.type : '?');
+        that.handleAskResult(result, answers);
+      }
+    }).catch(function () {
+      console.log('[advice] 全部远程失败，使用硬编码 fallback');
+      that.askFallback(answers);
+    });
+  },
+
+  _minWait: function (fn, minMs) {
+    minMs = minMs || 1000;
+    var elapsed = this._waitStart ? (Date.now() - this._waitStart) : minMs;
+    var delay = Math.max(0, minMs - elapsed);
+    var that = this;
+    if (delay > 0) {
+      setTimeout(function () { fn.call(that); }, delay);
+    } else {
+      fn.call(that);
+    }
+  },
+
+  handleAskResult: function (result, answers) {
+    var that = this;
+    if (result.card && result.card.type === 'question') {
+      this._minWait(function () {
+        var card = result.card;
+        var newQ = { type: card.questionType, text: card.text, options: card.options || [] };
+        var nextIndex = that.data.currentQIndex + 1;
+
+        that.setData({
+          answers: answers, currentQIndex: nextIndex,
+          isLastQuestion: card.isLast || false,
+          questionType: card.questionType,
+          showOptions: card.questionType === 'choice',
+          totalQuestions: card.totalQuestions || that.data.totalQuestions,
+          questions: that.data.questions.concat([newQ])
+        });
+      });
+    } else if (result.card && result.card.type === 'strategy_list') {
+      this.setData({ step: 2, answers: answers });
+      setTimeout(function () { that.showStrategies(result, answers); }, 1200);
+    }
+  },
+
+  askFallback: function (answers) {
+    var that = this;
+    var nextIndex = this.data.currentQIndex + 1;
+    var qs = this.data.questions;
+
+    if (answers.length === 1 && this.data.currentQIndex === 0 && qs[0].type === 'free') {
+      var fb = this.generateQuestions(answers[0].answer || '');
+      if (fb.length > 0 && fb[0].type !== 'free') {
+        qs = qs.concat(fb);
+        this.setData({ questions: qs, totalQuestions: qs.length, questionType: qs[1].type, showOptions: qs[1].type === 'choice' });
+      }
+    }
+
+    if (nextIndex >= qs.length || answers.length >= 5) {
+      this.setData({ answers: answers, step: 2 });
+      setTimeout(function () { that.generateResults(); }, 600);
     } else {
       this.setData({
-        answers,
-        currentQIndex: nextIndex,
-        isLastQuestion: nextIndex === this.data.questions.length - 1
+        answers: answers, currentQIndex: nextIndex,
+        isLastQuestion: nextIndex === qs.length - 1,
+        questionType: qs[nextIndex].type, showOptions: qs[nextIndex].type === 'choice'
       });
     }
   },
 
-  /* ========== Step 2 → 3: 生成策略 ========== */
+  /* ========== 展示策略 ========== */
 
-  generateResults() {
-    const s = this.data.situation;
-    var context = '社交场景';
-    if (/导师|论文|毕业/.test(s)) context = '导师催论文';
-    else if (/拒绝|不想|借钱/.test(s)) context = '拒绝请求';
-    else if (/领导|老板|加薪|考核/.test(s)) context = '职场上下级';
-    else if (/对象|女朋|男朋|暧昧/.test(s)) context = '亲密关系';
-
-    const templates = this.getTemplates();
-    const strategies = templates[context] || templates['导师催论文'];
-
+  showStrategies: function (result, answers) {
+    var card = result.card;
     this.setData({
       step: 3,
-      contextLabel: context,
-      strategies: strategies
+      answers: answers,
+      contextLabel: card.contextLabel || '社交咨询',
+      strategies: (card.strategies || []).map(function (s, i) {
+        return {
+          typeKey: s.typeKey || ('llm_' + i),
+          typeLabel: s.typeLabel || ('策略' + (i + 1)),
+          script: s.script || '',
+          rhythm: s.rhythm || '',
+          counterQuestion: s.counterQuestion || s.counterPrediction || '',
+          risk: s.risk || '',
+          strategicNote: s.strategicNote || ''
+        };
+      })
     });
   },
 
-  /* ========== Step 3: 策略结果 — 原子组件事件处理 ========== */
+  /* ========== 生成策略 ========== */
 
-  /** strategy-list-card copy 事件 */
-  onStrategyCopy(e) {
-    const { script } = e.detail;
+  generateResults: function () {
+    var that = this;
+    var answers = this.data.answers;
+
+    var genData = {
+      situation: answers.length > 0 ? answers[0].answer : '',
+      answers: answers,
+      phase: 'generate',
+      profile: this.getProfile()
+    };
+
+    console.log('[advice] Generate: 调用 dev server...');
+    this.callDevServer(genData).then(function (result) {
+      console.log('[advice] Generate: dev server 返回');
+      that.showStrategies(result, answers);
+    }).catch(function (err) {
+      console.log('[advice] Generate: dev server 失败:', err.message || err.errMsg);
+      return that.callCloud('getSocialAdvice', genData);
+    }).then(function (result) {
+      if (result) {
+        console.log('[advice] Generate: 云函数返回');
+        that.showStrategies(result, answers);
+      }
+    }).catch(function () {
+      console.log('[advice] Generate: 全部远程失败，使用硬编码');
+      var s = answers.length > 0 ? answers[0].answer : '';
+      var ctx = '社交场景';
+      if (/导师|论文|毕业/.test(s)) ctx = '导师催论文';
+      else if (/拒绝|不想|借钱/.test(s)) ctx = '拒绝请求';
+      else if (/领导|老板|加薪|考核/.test(s)) ctx = '职场上下级';
+      else if (/对象|女朋|男朋|暧昧/.test(s)) ctx = '亲密关系';
+
+      var templates = that.getTemplates();
+      var strategies = templates[ctx] || templates['导师催论文'];
+
+      that.setData({ step: 3, contextLabel: ctx, strategies: strategies });
+    });
+  },
+
+  /* ========== 复制 & 重置 ========== */
+
+  onStrategyCopy: function (e) {
     wx.setClipboardData({
-      data: script,
-      success: () => {
+      data: e.detail.script,
+      success: function () {
         wx.showToast({ title: '已复制到剪贴板', icon: 'success', duration: 1500 });
       }
     });
   },
 
-  resetAdvice() {
+  resetAdvice: function () {
     this.setData({
-      step: 0, situation: '', questions: [],
+      step: 0, questions: [],
       currentQIndex: 0, answers: [], strategies: [],
-      isLastQuestion: false, contextLabel: ''
+      isLastQuestion: false, contextLabel: '',
+      activeScene: '', freeText: '',
+      totalQuestions: 5, questionType: 'free', showOptions: false, cloudAvailable: true,
+      sceneChips: this.data.sceneChips.map(function (c) {
+        return { id: c.id, label: c.label, icon: c.icon, color: c.color, active: false };
+      })
     });
   },
 
-  /* ========== 策略模板（MVP，后续对接 LLM） ========== */
+  /* ========== 策略模板（本地 fallback） ========== */
 
-  getTemplates() {
+  getTemplates: function () {
     return {
       '导师催论文': [
         { typeKey: 'positive', typeLabel: '① 正向回应型', script: '好的老师，我尽量在这周内改完发给您。不过有几个地方我还在补充数据，如果有延迟我会提前跟您说。', rhythm: '立刻回复，表达积极态度', counterQuestion: '哪几个地方？具体什么时候能给我？', risk: '如果最终没完成，会被认为说了空话。只在确定能完成大部分时选这条。', strategicNote: '正向回应不是跪舔，是表达积极态度+给自己留后路。注意后面那句"如果有延迟会提前说"是关键——它把你的底线悄悄放进去了。' },

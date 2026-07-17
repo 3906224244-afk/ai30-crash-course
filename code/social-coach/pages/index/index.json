@@ -1,5 +1,4 @@
 {
-  "navigationBarTitleText": "人情世故顾问",
-  "navigationBarBackgroundColor": "#1a1a2e",
-  "navigationBarTextStyle": "white"
+  "navigationStyle": "custom",
+  "usingComponents": {}
 }

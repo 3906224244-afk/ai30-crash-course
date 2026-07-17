@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/advice/advice",
     "pages/profile/profile",
+    "pages/profile/edit/edit",
     "pages/etiquette/etiquette"
   ],
   "usingComponents": {
@@ -10,40 +11,49 @@
     "question-card": "/components/question-card/index",
     "strategy-list-card": "/components/strategy-list-card/index",
     "knowledge-card": "/components/knowledge-card/index",
-    "text-card": "/components/text-card/index"
+    "text-card": "/components/text-card/index",
+    "grain-field": "/components/grain-field/index"
   },
   "window": {
-    "navigationBarBackgroundColor": "#1a1a2e",
+    "navigationBarBackgroundColor": "#FDFBF7",
     "navigationBarTitleText": "人情世故顾问",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f5f5f5"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FDFBF7"
   },
   "tabBar": {
+    "custom": true,
     "color": "#999999",
-    "selectedColor": "#e94560",
-    "backgroundColor": "#ffffff",
+    "selectedColor": "#2D2D2D",
+    "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "咨询",
-        "iconPath": "images/icon-ask.png",
-        "selectedIconPath": "images/icon-ask-active.png"
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/advice/advice",
+        "text": "咨询"
       },
       {
         "pagePath": "pages/etiquette/etiquette",
-        "text": "知识库",
-        "iconPath": "images/icon-book.png",
-        "selectedIconPath": "images/icon-book-active.png"
+        "text": "知识库"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的",
-        "iconPath": "images/icon-me.png",
-        "selectedIconPath": "images/icon-me-active.png"
+        "text": "我的"
       }
     ]
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "agent": {
+    "skills": [
+      {
+        "name": "social-coach",
+        "description": "人情世故顾问——为20-30岁年轻人提供定制化社交回复策略。用户描述社交困境后，AI先让用户自由叙述完整情况，再追问最多4道选择题补缺口，最后生成3-5条不同博弈姿态的回复方案（含话术/节奏/风险预判）。",
+        "path": "."
+      }
+    ]
+  }
 }

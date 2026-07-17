@@ -1,28 +1,88 @@
-<!-- 分流页 -->
-<view class="container">
-  <view class="hero">
-    <text class="hero-emoji">🎯</text>
-    <text class="hero-title">人情世故顾问</text>
-    <text class="hero-sub">社交场景AI助手 · 帮你把话说对</text>
-  </view>
+<!-- 首页 — 简笔画插画Hero + 手绘按钮 + 便签知识卡 -->
+<scroll-view class="page-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+  <view class="container">
 
-  <view class="split-area">
-    <view class="split-card urgent" bindtap="goAdvice">
-      <view class="card-icon">🆘</view>
-      <text class="card-title">急需答案</text>
-      <text class="card-desc">直接说问题，我边问边记，立刻给你方案</text>
-      <view class="card-arrow">→</view>
+    <!-- Hero — 简笔画场景插画 swiper -->
+    <view class="hero-wrap">
+      <swiper
+        class="hero-swiper"
+        autoplay
+        circular
+        interval="{{4000}}"
+        duration="{{600}}"
+        bindchange="onHeroChange"
+      >
+        <swiper-item wx:for="{{heroSlides}}" wx:key="scene">
+          <view class="hero-slide {{index === heroIndex ? 'slide-active' : ''}}">
+            <image class="hero-illust {{index === heroIndex ? 'illust-pop' : ''}}" src="{{item.image}}" mode="aspectFit" />
+            <view class="hero-text">
+              <text class="hero-tagline {{index === heroIndex ? 'text-slide-in' : ''}}" style="animation-delay: {{index === heroIndex ? '0.05s' : '0s'}}">{{item.tagline}}</text>
+              <text class="hero-sub {{index === heroIndex ? 'text-slide-in' : ''}}" style="animation-delay: {{index === heroIndex ? '0.2s' : '0s'}}">{{item.sub}}</text>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <!-- 自定义指示器 — 画线效果 -->
+      <view class="hero-dots">
+        <view
+          wx:for="{{heroSlides}}"
+          wx:key="scene"
+          class="hdot {{index === heroIndex ? 'hdot-active' : ''}}"
+        ></view>
+      </view>
     </view>
 
-    <view class="split-card prepare" bindtap="goProfile">
-      <view class="card-icon">📝</view>
-      <text class="card-title">提前录入</text>
-      <text class="card-desc">花1-2分钟建你的人设档案，以后咨询更快更准</text>
-      <view class="card-arrow">→</view>
+    <!-- 按钮区 — 手绘硬影按钮 -->
+    <view class="action-area">
+      <view class="btn-primary" bindtap="goConsult" hover-class="none">
+        <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
+        <text>开始咨询</text>
+      </view>
+      <view class="btn-secondary" bindtap="goProfile" hover-class="none">
+        <image class="btn-bg-img" src="/images/btn-secondary-bg.png" mode="aspectFill" />
+        <text>预存人设</text>
+      </view>
     </view>
-  </view>
 
-  <view class="hint" wx:if="{{hasProfile}}">
-    <text>✅ 你已有存档人设，可以直接咨询</text>
+    <!-- 知识卡便签轮播 -->
+    <view class="knowledge-section">
+      <view class="section-head">
+        <text class="section-title">人情世故小贴士</text>
+        <text class="section-hint">← 左右滑动 →</text>
+      </view>
+      <swiper
+        class="card-swiper"
+        autoplay
+        circular
+        interval="{{4000}}"
+        duration="{{400}}"
+        previous-margin="48rpx"
+        next-margin="48rpx"
+        bindchange="onCardChange"
+      >
+        <swiper-item wx:for="{{featuredKnowledges}}" wx:key="id">
+          <view class="sticky-card" data-id="{{item.id}}" bindtap="goKnowledgeDetail">
+            <!-- 胶带装饰 -->
+            <image class="card-tape" src="/images/ui-tape.svg" mode="aspectFit" />
+            <!-- 简笔画图标 -->
+            <image class="card-icon" src="{{item.iconImg}}" mode="aspectFit" />
+            <text class="card-tag">{{item.tags[0]}}</text>
+            <text class="card-title">{{item.title}}</text>
+            <text class="card-brief">{{item.brief}}</text>
+            <text class="card-more">查看详情 →</text>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="swiper-dots">
+        <view
+          wx:for="{{featuredKnowledges}}"
+          wx:key="id"
+          class="dot {{currentCard === index ? 'dot-active' : ''}}"
+        ></view>
+      </view>
+    </view>
+
+    <view class="page-bottom"></view>
+
   </view>
-</view>
+</scroll-view>

@@ -1,71 +1,105 @@
-<!-- 知识库浏览页 -->
-<view class="container">
-  <view class="page-header">
-    <text class="page-icon">📚</text>
-    <text class="page-title">社交知识库</text>
-    <text class="page-sub">查阅常见社交规则和人情世故</text>
-  </view>
+<!-- 知识库 — 奶油纸底 + 手绘卡片 -->
+<scroll-view class="page-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+  <view class="container">
 
-  <!-- 搜索 -->
-  <view class="search-bar">
-    <text class="search-icon">🔍</text>
-    <input
-      class="search-input"
-      placeholder="搜索礼仪规则、行情..."
-      value="{{keyword}}"
-      bindinput="onSearch"
-    />
-  </view>
-
-  <!-- 分类 -->
-  <scroll-view class="categories" scroll-x>
-    <view
-      wx:for="{{categories}}"
-      wx:key="*this"
-      class="cat-tag {{activeCategory === item ? 'active' : ''}}"
-      data-cat="{{item}}"
-      bindtap="switchCategory"
-    >
-      <text>{{item}}</text>
+    <!-- 搜索栏 — 手绘边框 -->
+    <view class="search-bar">
+      <image class="search-icon" src="/images/ui-search.svg" mode="aspectFit" />
+      <input
+        class="search-input"
+        placeholder="搜索规则..."
+        placeholder-style="#999"
+        value="{{keyword}}"
+        bindinput="onSearch"
+      />
     </view>
-  </scroll-view>
 
-  <!-- 条目列表 -->
-  <view class="entry-list">
-    <view
-      wx:for="{{filteredEntries}}"
-      wx:key="id"
-      class="entry-card"
-      data-id="{{item.id}}"
-      bindtap="viewDetail"
-    >
-      <view class="entry-header">
-        <text class="entry-icon">{{item.icon}}</text>
-        <view class="entry-info">
-          <text class="entry-title">{{item.title}}</text>
-          <text class="entry-brief">{{item.brief}}</text>
+    <!-- 分类 chips — 手绘胶囊 -->
+    <scroll-view class="categories" scroll-x show-scrollbar="{{false}}">
+      <view
+        wx:for="{{categories}}"
+        wx:key="*this"
+        class="cat-chip {{activeCategory === item ? 'cat-on' : ''}}"
+        data-cat="{{item}}"
+        bindtap="switchCategory"
+      >
+        <text>{{item}}</text>
+      </view>
+    </scroll-view>
+
+    <!-- 卡片网格 — 2列 -->
+    <view class="card-grid" wx:if="{{filteredEntries.length > 0}}">
+      <view
+        wx:for="{{filteredEntries}}"
+        wx:key="id"
+        class="know-card"
+        style="background: {{item.cardColor}};"
+        data-id="{{item.id}}"
+        bindtap="viewDetail"
+      >
+        <!-- 简笔画图标 -->
+        <image class="card-icon-img" src="{{item.iconImg}}" mode="aspectFit" />
+
+        <!-- 内容 -->
+        <view class="card-body">
+          <text class="card-title">{{item.title}}</text>
+          <text class="card-brief">{{item.brief}}</text>
+        </view>
+
+        <!-- 标签 -->
+        <view class="card-tags">
+          <text class="c-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
         </view>
       </view>
-      <view class="entry-tags">
-        <text class="e-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
-      </view>
     </view>
 
+    <!-- 空态 -->
     <view class="empty" wx:if="{{filteredEntries.length === 0}}">
-      <text>暂无匹配内容，更多知识持续更新中...</text>
+      <image class="empty-icon" src="/images/ui-empty.svg" mode="aspectFit" />
+      <text class="empty-text">暂无匹配内容</text>
+      <text class="empty-sub">换个关键词或分类试试</text>
     </view>
-  </view>
 
-  <!-- 详情弹窗 -->
-  <view class="detail-mask" wx:if="{{showDetail}}" bindtap="closeDetail">
-    <view class="detail-card" catchtap="">
+    <view class="page-bottom"></view>
+
+  </view>
+</scroll-view>
+
+<!-- ===== 详情弹窗 — 手绘便签 ===== -->
+<view class="detail-mask" wx:if="{{showDetail}}" bindtap="closeDetail">
+  <view class="detail-card" catchtap="">
+    <!-- 胶带装饰 -->
+    <image class="detail-tape" src="/images/ui-tape.svg" mode="aspectFit" />
+
+    <view class="detail-body">
+      <image class="detail-icon" src="{{currentEntry.iconImg}}" mode="aspectFit" />
       <text class="detail-title">{{currentEntry.title}}</text>
-      <view class="detail-divider"></view>
-      <text class="detail-content">{{currentEntry.content}}</text>
-      <view class="detail-source" wx:if="{{currentEntry.source}}">
-        <text>📌 来源：{{currentEntry.source}}</text>
+
+      <view class="detail-tags">
+        <text class="d-tag" wx:for="{{currentEntry.tags}}" wx:key="*this">{{item}}</text>
       </view>
-      <button class="btn-primary detail-close" bindtap="closeDetail">知道了</button>
+
+      <view class="detail-divider"></view>
+
+      <text class="detail-content">{{currentEntry.content}}</text>
+
+      <!-- 使用提示 -->
+      <view class="detail-tips" wx:if="{{currentEntry.tips && currentEntry.tips.length > 0}}">
+        <text class="tips-label">核心提示</text>
+        <view class="tip-row" wx:for="{{currentEntry.tips}}" wx:key="*this">
+          <text class="tip-bullet">•</text>
+          <text class="tip-text">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="detail-source" wx:if="{{currentEntry.source}}">
+        <text>📌 {{currentEntry.source}}</text>
+      </view>
+
+      <view class="detail-close-btn" bindtap="closeDetail">
+        <image class="btn-bg-img" src="/images/btn-secondary-bg.png" mode="aspectFill" />
+        <text>关闭</text>
+      </view>
     </view>
   </view>
 </view>

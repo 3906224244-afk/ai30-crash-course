@@ -1,0 +1,60 @@
+/* ===== 底部导航 — 手绘风格 ===== */
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: var(--bg-card);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1.5px solid #2D2D2D;
+  height: 100rpx;
+  box-shadow: 0 -3px 0 #2D2D2D;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+  margin-bottom: 2rpx;
+  opacity: 0.35;
+  transition: opacity 0.12s ease;
+}
+
+.tab-text {
+  font-size: 20rpx;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  transition: color 0.12s ease;
+}
+
+.tab-item.active .tab-icon {
+  opacity: 1;
+}
+
+.tab-item.active .tab-text {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* 选中指示器 — 短线 */
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  top: 6rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32rpx;
+  height: 4rpx;
+  background: var(--accent-warm);
+  border-radius: 2rpx;
+}

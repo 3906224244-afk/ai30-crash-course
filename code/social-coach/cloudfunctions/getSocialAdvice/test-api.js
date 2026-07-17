@@ -16,6 +16,6 @@ console.log('思考中...\n');
 
 var userMsg = '用户描述："' + myScene + '"\n\n尚未收集任何信息。\n\n请判断信息是否充足，返回 JSON。';
 
-d.chat(p.ASK_PROMPT, userMsg, { maxTokens: 1024 })
+d.chat(p.ASK_PROMPT, userMsg, { maxTokens: 4096 })
   .then(function (r) { console.log(r); })
   .catch(function (e) { console.log('失败: ' + e.message); });

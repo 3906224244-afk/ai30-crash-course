@@ -1,131 +1,164 @@
-/* ========== strategy-list-card 原子组件样式 ========== */
+/* ===== strategy-list-card — 手绘便签式 ===== */
 
 .card-container {
   position: relative;
-  background: #fff;
-  border-radius: 4px;
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 20rpx 30rpx 14rpx 28rpx;
   margin: 0 16px;
-  padding: 20px 16px;
+  padding: 32rpx;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 4px 4px 0 #2D2D2D;
+  transform: rotate(-0.3deg);
 }
 
 /* ===== 引导区 ===== */
 .guide-section {
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 24rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1.5px dashed var(--border);
 }
 
 .guide-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
 }
 
 .context-badge {
-  font-size: 12px;
-  color: #e94560;
-  background: #fef2f2;
-  padding: 2px 10px;
-  border-radius: 10px;
+  font-size: 22rpx;
+  color: var(--accent);
+  background: var(--accent-ghost);
+  padding: 4rpx 16rpx;
+  border-radius: 4rpx;
+  border: 1px solid var(--accent-warm);
   font-weight: 500;
 }
 
 .guide-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: #1a1a2e;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .guide-intro {
-  font-size: 12px;
-  color: #888;
-  line-height: 1.6;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.7;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 /* 快速参考表 */
 .quick-ref {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
+  gap: 2rpx;
+  margin-bottom: 12rpx;
 }
 
 .ref-row {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
-  gap: 8px;
-  border-radius: 4px;
+  padding: 6rpx 0;
+  gap: 12rpx;
 }
 
-
 .ref-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 2rpx 12rpx;
+  border-radius: 4rpx;
+  border: 1px solid var(--border);
+  background: var(--bg-card-muted);
   flex-shrink: 0;
 }
 
+.ref-badge text {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
 .ref-desc {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.4;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 .guide-tip {
-  background: #fef9e7;
-  border-radius: 4px;
-  padding: 8px 12px;
+  padding: 16rpx 20rpx;
+  border-left: 4rpx solid var(--accent);
+  background: var(--accent-ghost);
+  border-radius: 0 8rpx 8rpx 0;
 }
 
 .guide-tip text {
-  font-size: 12px;
-  color: #b7950b;
-  line-height: 1.5;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 /* ===== 策略列表 ===== */
 .strategies-section {
-  margin-bottom: 12px;
+  margin-bottom: 16rpx;
+}
+
+.section-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.section-icon {
+  width: 32rpx;
+  height: 32rpx;
+  opacity: 0.5;
 }
 
 .section-label {
-  display: block;
-  font-size: 12px;
+  font-size: 24rpx;
   font-weight: 600;
-  color: #666;
-  margin-bottom: 8px;
+  color: var(--text-secondary);
 }
 
-/* 策略行 */
 .strategy-row {
-  margin-bottom: 8px;
-  border-radius: 4px;
-  background: #fafafa;
+  margin-bottom: 10rpx;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-muted);
+  border: 1.5px solid var(--border);
   overflow: hidden;
+  transition: border-color var(--transition);
 }
 
-/* 折叠头 */
+.strategy-row.expanded {
+  border-color: #2D2D2D;
+}
+
 .strategy-header {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
-  gap: 8px;
+  padding: 16rpx 20rpx;
+  gap: 12rpx;
 }
 
 .strategy-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4rpx 14rpx;
+  border-radius: 4rpx;
+  background: var(--accent-warm);
+  border: 1px solid #2D2D2D;
   flex-shrink: 0;
 }
 
+.strategy-badge text {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .strategy-preview {
-  font-size: 12px;
-  color: #666;
+  font-size: 26rpx;
+  color: var(--text-secondary);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -133,210 +166,138 @@
 }
 
 .expand-arrow {
-  font-size: 12px;
-  color: #bbb;
+  font-size: 20rpx;
+  color: var(--text-tertiary);
   flex-shrink: 0;
 }
 
-/* 展开体 */
 .strategy-body {
-  padding: 0 12px 12px 12px;
+  padding: 0 20rpx 20rpx;
 }
 
-/* 话术区 */
 .script-area {
+  background: var(--bg-card);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20rpx;
+  margin-bottom: 16rpx;
   position: relative;
-  background: #fff;
-  border-radius: 4px;
-  padding: 12px;
-  margin-bottom: 12px;
 }
 
 .script-text {
-  font-size: 15px;
-  color: #333;
+  font-size: 28rpx;
+  color: var(--text-primary);
   line-height: 1.8;
   display: block;
-  padding-right: 50px;
+  padding-right: 80rpx;
 }
 
 .copy-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #e94560;
-  padding: 4px 12px;
-  border-radius: 12px;
+  top: 16rpx;
+  right: 16rpx;
+  overflow: hidden;
+  padding: 8rpx 24rpx;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  transform: translate(0, 0) rotate(0.3deg);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .copy-btn text {
-  font-size: 12px;
-  color: #fff;
-  font-weight: 500;
+  font-size: 22rpx;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
+.copy-btn:active {
+  transform: translate(3px, 3px) rotate(0.3deg);
+  box-shadow: none;
+}
 
-/* 详细信息 */
 .meta-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 10rpx;
+  margin-bottom: 16rpx;
 }
 
 .meta-row {
   display: flex;
   align-items: flex-start;
-  gap: 4px;
+  gap: 8rpx;
 }
 
 .meta-icon {
-  font-size: 12px;
+  width: 32rpx;
+  height: 32rpx;
   flex-shrink: 0;
+  opacity: 0.5;
 }
 
 .meta-label {
-  font-size: 12px;
-  color: #888;
+  font-size: 24rpx;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .meta-value {
-  font-size: 12px;
-  color: #555;
-  line-height: 1.5;
+  font-size: 24rpx;
+  color: var(--text-primary);
+  line-height: 1.6;
   flex: 1;
 }
 
 .risk-meta .meta-value {
-  color: #c0392b;
+  color: #C44E3D;
 }
 
-/* 战略标注 */
 .strategy-note {
-  background: linear-gradient(135deg, #fef2f2, #fef9e7);
-  border-radius: 4px;
-  padding: 8px 12px;
+  padding: 16rpx 20rpx;
+  border-left: 4rpx solid var(--accent);
+  background: var(--accent-ghost);
+  border-radius: 0 8rpx 8rpx 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8rpx;
+}
+
+.strategy-note .meta-icon {
+  margin-top: 2rpx;
 }
 
 .note-label {
-  display: block;
-  font-size: 12px;
+  font-size: 22rpx;
   font-weight: 600;
-  color: #c23152;
-  margin-bottom: 4px;
+  color: var(--accent);
 }
 
 .note-text {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.6;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  width: 100%;
 }
 
-/* 展开全部按钮 */
 .show-all-btn {
   text-align: center;
-  padding: 8px 0;
-  border-top: 1px dashed #e8e8e8;
+  padding: 12rpx 0;
+  border-top: 1.5px dashed var(--border);
 }
 
 .show-all-btn text {
-  font-size: 12px;
-  color: #e94560;
+  font-size: 24rpx;
+  color: var(--text-secondary);
 }
-
 
 .bottom-fade {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 32px;
-  background: linear-gradient(transparent, #fff);
+  height: 24rpx;
+  background: linear-gradient(transparent, var(--bg-card));
   pointer-events: none;
-}
-
-/* ========== 暗黑模式 ========== */
-@media (prefers-color-scheme: dark) {
-  .card-container {
-    background: #2a2a2e;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .guide-section {
-    border-bottom-color: #404040;
-  }
-
-  .context-badge {
-    background: #3a2020;
-  }
-
-  .guide-title {
-    color: #e0e0e0;
-  }
-
-  .guide-intro {
-    color: #808080;
-  }
-
-  .ref-desc {
-    color: #a0a0a0;
-  }
-
-
-  .guide-tip {
-    background: #3a3020;
-  }
-
-  .guide-tip text {
-    color: #c0a010;
-  }
-
-  .section-label {
-    color: #a0a0a0;
-  }
-
-  .strategy-row {
-    background: #333;
-  }
-
-  .strategy-preview {
-    color: #a0a0a0;
-  }
-
-  .expand-arrow {
-    color: #808080;
-  }
-
-  .script-area {
-    background: #1a1a2e;
-  }
-
-  .script-text {
-    color: #b0b0b0;
-  }
-
-  .meta-value {
-    color: #a0a0a0;
-  }
-
-  .risk-meta .meta-value {
-    color: #e07070;
-  }
-
-  .strategy-note {
-    background: linear-gradient(135deg, #3a2020, #3a3020);
-  }
-
-  .note-text {
-    color: #a0a0a0;
-  }
-
-  .show-all-btn {
-    border-top-color: #404040;
-  }
-
-  .bottom-fade {
-    background: linear-gradient(transparent, #2a2a2e);
-  }
 }

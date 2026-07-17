@@ -1,57 +1,38 @@
-/* ========== text-card 原子组件样式 ========== */
+/* ===== text-card — 手绘纸条 ===== */
 
 .card-container {
   position: relative;
-  background: #fff;
-  border-radius: 4px;
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 18rpx 28rpx 14rpx 24rpx;
   margin: 0 16px;
-  padding: 20px 16px;
+  padding: 28rpx 24rpx;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 3px 3px 0 #2D2D2D;
+  transform: rotate(-0.3deg);
 }
 
 .card-title {
   display: block;
-  font-size: 17px;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 12px;
+  color: var(--text-primary);
+  margin-bottom: 16rpx;
   line-height: 1.5;
 }
 
 .card-body {
-  font-size: 15px;
-  color: #555;
+  font-size: 28rpx;
+  color: var(--text-secondary);
   line-height: 1.8;
 }
 
-/* 底部渐变遮罩：指示内容可能被截断 */
 .bottom-fade {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 32px;
-  background: linear-gradient(transparent, #fff);
+  height: 32rpx;
+  background: linear-gradient(transparent, var(--bg-card));
   pointer-events: none;
-}
-
-/* ========== 暗黑模式 ========== */
-@media (prefers-color-scheme: dark) {
-  .card-container {
-    background: #2a2a2e;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-title {
-    color: #e0e0e0;
-  }
-
-  .card-body {
-    color: #b0b0b0;
-  }
-
-  .bottom-fade {
-    background: linear-gradient(transparent, #2a2a2e);
-  }
 }

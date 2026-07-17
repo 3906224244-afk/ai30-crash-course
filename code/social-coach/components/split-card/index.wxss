@@ -1,48 +1,57 @@
-/* ========== split-card 原子组件样式 ========== */
+/* ===== split-card — 手绘选项卡 ===== */
 
 .card-container {
   position: relative;
-  background: #fff;
-  border-radius: 4px;
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 24rpx 18rpx 28rpx 16rpx;
   margin: 0 16px;
-  padding: 20px 16px;
+  padding: 28rpx 24rpx;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 3px 3px 0 #2D2D2D;
+  transform: rotate(0.35deg);
 }
 
 .card-title {
   display: block;
-  font-size: 17px;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 16px;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
   text-align: center;
 }
 
 .options-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14rpx;
 }
 
-/* 选项卡片 */
 .option-item {
   display: flex;
   align-items: center;
-  padding: 16px 12px;
-  border-radius: 4px;
-  border-left: 4px solid #e8e8e8;
-  background: #fafafa;
+  padding: 20rpx 16rpx;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card-muted);
+  box-shadow: var(--shadow-hard-sm);
+  transform: translate(0, 0);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
-/* urgent — 品牌红 */
+.option-item:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #2D2D2D;
+}
+
 .option-urgent {
-  border-left-color: #e94560;
+  border-color: #2D2D2D;
+  border-left-width: 5rpx;
 }
 
-/* prepare — 深蓝 */
 .option-prepare {
-  border-left-color: #0f3460;
+  border-color: #2D2D2D;
+  border-left-width: 5rpx;
 }
 
 .option-content {
@@ -52,22 +61,22 @@
 }
 
 .option-label {
-  font-size: 15px;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 4px;
+  color: var(--text-primary);
+  margin-bottom: 6rpx;
 }
 
 .option-desc {
-  font-size: 12px;
-  color: #888;
+  font-size: 24rpx;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
 .option-arrow {
-  font-size: 17px;
-  color: #ccc;
-  margin-left: 8px;
+  font-size: 32rpx;
+  color: var(--text-tertiary);
+  margin-left: 8rpx;
 }
 
 .bottom-fade {
@@ -75,48 +84,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 24px;
-  background: linear-gradient(transparent, #fff);
+  height: 24rpx;
+  background: linear-gradient(transparent, var(--bg-card));
   pointer-events: none;
-}
-
-/* ========== 暗黑模式 ========== */
-@media (prefers-color-scheme: dark) {
-  .card-container {
-    background: #2a2a2e;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-title {
-    color: #e0e0e0;
-  }
-
-  .option-item {
-    background: #333;
-    border-left-color: #404040;
-  }
-
-  .option-urgent {
-    border-left-color: #e94560;
-  }
-
-  .option-prepare {
-    border-left-color: #5a8fd4;
-  }
-
-  .option-label {
-    color: #e0e0e0;
-  }
-
-  .option-desc {
-    color: #808080;
-  }
-
-  .option-arrow {
-    color: #666;
-  }
-
-  .bottom-fade {
-    background: linear-gradient(transparent, #2a2a2e);
-  }
 }

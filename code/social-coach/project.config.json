@@ -43,7 +43,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.6.0",
+  "libVersion": "3.15.1",
   "appid": "wx9808f947cde21de3",
   "projectname": "social-coach",
   "cloudfunctionRoot": "cloudfunctions/",

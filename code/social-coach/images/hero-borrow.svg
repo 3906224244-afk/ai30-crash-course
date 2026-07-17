@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 900" width="750" height="900">
+
+  <rect width="750" height="900" fill="#FDFBF7"/>
+  <!-- 桌子 -->
+  <rect x="160" y="440" width="430" height="100" rx="14" fill="none" stroke="#4A4A4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 左边人 -->
+  <circle cx="280" cy="250" r="34" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M246 290 Q280 420 246 460" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 右边人 -->
+  <circle cx="470" cy="250" r="34" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M436 290 Q470 420 504 460" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 右边→左边的对话框 -->
+  <path d="M420 170 Q500 170 500 130 L500 100 Q500 60 420 60 L160 60 Q80 60 80 100 L80 140" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="290" y="100" text-anchor="middle" font-size="26" fill="#4A4A4A" font-family="PingFang SC,sans-serif">"兄弟，借点钱..."</text>
+  <!-- 左边的拒绝手势 ✋ -->
+  <circle cx="260" cy="310" r="24" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="245" y1="295" x2="275" y2="325" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="275" y1="295" x2="245" y2="325" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 桌上硬币 -->
+  <circle cx="400" cy="500" r="14" fill="#EDDBA8" stroke="#4A4A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="400" y="506" text-anchor="middle" font-size="14" fill="#4A4A4A" font-weight="700">¥</text>
+  <circle cx="440" cy="505" r="10" fill="none" stroke="#4A4A4A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="375" y="850" text-anchor="middle" font-family="PingFang SC,sans-serif" font-size="36" fill="#4A4A4A" font-weight="700">拒绝是边界，不是冷漠</text>
+
+</svg>

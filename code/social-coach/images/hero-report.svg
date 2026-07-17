@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 900" width="750" height="900">
+
+  <rect width="750" height="900" fill="#FDFBF7"/>
+  <!-- 白板 -->
+  <rect x="130" y="80" width="490" height="320" rx="10" fill="none" stroke="#4A4A4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 白板上的柱状图 -->
+  <rect x="180" y="200" width="70" height="150" rx="6" fill="#EDDBA8" stroke="#4A4A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="280" y="240" width="70" height="110" rx="6" fill="none" stroke="#4A4A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="380" y="170" width="70" height="180" rx="6" fill="#EDDBA8" opacity="0.7" stroke="#4A4A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="480" y="270" width="70" height="80" rx="6" fill="none" stroke="#4A4A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 趋势线 -->
+  <path d="M215 340 Q330 380 415 310 Q500 250 545 320" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="545" cy="320" r="7" fill="#DC4A2D" stroke="#4A4A4A" stroke-width="1.5"/>
+  <!-- 白板支架 -->
+  <line x1="300" y1="400" x2="280" y2="520" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="450" y1="400" x2="470" y2="520" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 汇报人 -->
+  <circle cx="375" cy="600" r="30" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M345 635 Q375 660 405 635" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M375 635 L375 710" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M330 680 Q375 695 420 680" fill="none" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 激光笔 -->
+  <line x1="420" y1="580" x2="510" y2="400" stroke="#4A4A4A" stroke-width="1.5" stroke-dasharray="6,4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="510" cy="400" r="5" fill="#DC4A2D" stroke="none"/>
+  <text x="375" y="850" text-anchor="middle" font-family="PingFang SC,sans-serif" font-size="36" fill="#4A4A4A" font-weight="700">汇报不是表演，是沟通</text>
+
+</svg>

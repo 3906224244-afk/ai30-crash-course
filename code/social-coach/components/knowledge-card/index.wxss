@@ -1,75 +1,75 @@
-/* ========== knowledge-card 原子组件样式 ========== */
+/* ===== knowledge-card — 手绘便签 ===== */
 
 .card-container {
   position: relative;
-  background: #fff;
-  border-radius: 4px;
+  background: var(--bg-card);
+  border: 1.5px solid #2D2D2D;
+  border-radius: 20rpx 30rpx 14rpx 26rpx;
   margin: 0 16px;
-  padding: 20px 16px;
+  padding: 28rpx 24rpx;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 3px 3px 0 #2D2D2D;
+  transform: rotate(-0.3deg);
 }
 
-/* 标题区 */
 .card-header {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 16rpx;
 }
 
 .header-icon {
-  font-size: 17px;
-  margin-right: 8px;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 12rpx;
 }
 
 .card-title {
-  font-size: 17px;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
 .card-divider {
   height: 1px;
-  background: #f0f0f0;
-  margin-bottom: 16px;
+  background: var(--border);
+  margin-bottom: 16rpx;
 }
 
-/* 正文 */
 .card-content {
-  margin-bottom: 16px;
+  margin-bottom: 16rpx;
 }
 
 .content-text {
-  font-size: 15px;
-  color: #333;
+  font-size: 28rpx;
+  color: var(--text-primary);
   line-height: 1.8;
-  /* 长文本截断：限制最大高度 ≈ 8行 × 1.8行高 × 15px */
   display: block;
   max-height: 216px;
   overflow: hidden;
 }
 
-/* 要点提示 */
 .tips-section {
-  background: #fafafa;
-  border-radius: 4px;
-  padding: 12px;
-  margin-bottom: 16px;
+  background: var(--bg-card-muted);
+  border: 1px solid var(--border);
+  border-radius: 8rpx;
+  padding: 16rpx;
+  margin-bottom: 16rpx;
 }
 
 .tips-header {
   display: block;
-  font-size: 12px;
+  font-size: 24rpx;
   font-weight: 600;
-  color: #666;
-  margin-bottom: 8px;
+  color: var(--text-secondary);
+  margin-bottom: 10rpx;
 }
 
 .tips-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 6rpx;
 }
 
 .tip-item {
@@ -78,20 +78,19 @@
 }
 
 .tip-dot {
-  font-size: 15px;
-  color: #e94560;
-  margin-right: 6px;
+  font-size: 28rpx;
+  color: var(--accent);
+  margin-right: 8rpx;
   line-height: 1.6;
 }
 
 .tip-text {
-  font-size: 12px;
-  color: #666;
+  font-size: 24rpx;
+  color: var(--text-secondary);
   line-height: 1.6;
   flex: 1;
 }
 
-/* 底部：来源 + 确认 */
 .card-footer {
   display: flex;
   align-items: center;
@@ -99,16 +98,25 @@
 }
 
 .source-text {
-  font-size: 12px;
-  color: #bbb;
+  font-size: 22rpx;
+  color: var(--text-tertiary);
 }
 
 .ack-btn {
-  background: #e94560;
-  color: #fff;
-  padding: 6px 20px;
-  border-radius: 20px;
-  font-size: 12px;
+  position: relative;
+  overflow: hidden;
+  padding: 8rpx 24rpx;
+  background: transparent;
+  border: none;
+  font-size: 24rpx;
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: none;
+  transform: rotate(0.3deg);
+}
+.ack-btn:active {
+  transform: translate(2px, 2px) rotate(0.3deg);
+  box-shadow: none;
 }
 
 .bottom-fade {
@@ -116,47 +124,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 32px;
-  background: linear-gradient(transparent, #fff);
+  height: 32rpx;
+  background: linear-gradient(transparent, var(--bg-card));
   pointer-events: none;
-}
-
-/* ========== 暗黑模式 ========== */
-@media (prefers-color-scheme: dark) {
-  .card-container {
-    background: #2a2a2e;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-title {
-    color: #e0e0e0;
-  }
-
-  .card-divider {
-    background: #404040;
-  }
-
-  .content-text {
-    color: #b0b0b0;
-  }
-
-  .tips-section {
-    background: #333;
-  }
-
-  .tips-header {
-    color: #a0a0a0;
-  }
-
-  .tip-text {
-    color: #a0a0a0;
-  }
-
-  .source-text {
-    color: #808080;
-  }
-
-  .bottom-fade {
-    background: linear-gradient(transparent, #2a2a2e);
-  }
 }
