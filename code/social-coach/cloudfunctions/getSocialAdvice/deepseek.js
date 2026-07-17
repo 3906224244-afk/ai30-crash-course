@@ -9,7 +9,13 @@
  */
 
 const https = require('https');
-const { DEEPSEEK_API_KEY } = require('./secret.js');
+
+// 优先读微信云函数环境变量，本地开发回落 secret.js
+var DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+if (!DEEPSEEK_API_KEY) {
+  try { DEEPSEEK_API_KEY = require('./secret.js').DEEPSEEK_API_KEY; }
+  catch (e) { console.log('deepseek.js: 无 API Key (env 或 secret.js 均缺失)'); }
+}
 
 const API_URL = 'api.deepseek.com';
 var MODEL = 'deepseek-v4-pro';      // 推理模型：Generate 策略生成

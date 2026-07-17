@@ -16,8 +16,10 @@ const fs = require('fs');
 const path = require('path');
 const zhipu = require('./zhipu-embedding.js');
 
-// 知识库文件路径（云函数运行时的相对路径）
-const KB_DIR = path.join(__dirname, '..', '..', 'agent', 'knowledge-base');
+// 知识库文件路径：优先云函数本地 kb/ 目录，回落 agent/knowledge-base（本地开发）
+const KB_DIR_LOCAL = path.join(__dirname, 'kb');
+const KB_DIR_DEV = path.join(__dirname, '..', '..', 'agent', 'knowledge-base');
+const KB_DIR = fs.existsSync(KB_DIR_LOCAL) ? KB_DIR_LOCAL : KB_DIR_DEV;
 
 // 缓存：运行时加载一次，避免每次检索都读文件
 var _cache = {};

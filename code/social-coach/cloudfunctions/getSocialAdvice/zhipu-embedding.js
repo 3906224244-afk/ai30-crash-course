@@ -8,7 +8,13 @@
  */
 
 var https = require('https');
-var { ZHIPU_API_KEY } = require('./secret.js');
+
+// 优先读微信云函数环境变量，本地开发回落 secret.js
+var ZHIPU_API_KEY = process.env.ZHIPU_API_KEY;
+if (!ZHIPU_API_KEY) {
+  try { ZHIPU_API_KEY = require('./secret.js').ZHIPU_API_KEY; }
+  catch (e) { console.log('zhipu-embedding.js: 无 API Key (env 或 secret.js 均缺失)'); }
+}
 
 var API_HOST = 'open.bigmodel.cn';
 var MODEL = 'embedding-3';
