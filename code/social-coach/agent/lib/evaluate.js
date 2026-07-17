@@ -7,6 +7,18 @@
 var { safeParseJSON } = require('../../cloudfunctions/getSocialAdvice/index.js');
 
 /**
+ * 带重试的 chat 调用——超时/网络抖动时重试1次
+ */
+async function chatWithRetry(deepseek, systemPrompt, userMsg, opts) {
+  try {
+    return await deepseek.chat(systemPrompt, userMsg, opts);
+  } catch (e) {
+    console.log('    首次调用失败 (' + e.message + ')，重试1次...');
+    return await deepseek.chat(systemPrompt, userMsg, opts);
+  }
+}
+
+/**
  * @param {Array} rules     - 待打分的规则数组
  * @param {object} deepseek - LLM调用模块
  * @param {object} prompts  - prompt集
@@ -31,7 +43,9 @@ async function scoreRules(rules, deepseek, prompts) {
     ].join('\n');
 
     try {
-      var raw = await deepseek.chat(prompts.PHASE5_EVALUATE, userMsg, { maxTokens: 8192 });
+      // 打分是评价任务而非深度推理，用标准模型（快且不易超时）；失败重试1次
+      var raw = await chatWithRetry(deepseek, prompts.PHASE5_EVALUATE, userMsg,
+        { maxTokens: 8192, model: deepseek.FAST_MODEL });
       var evaluation = safeParseJSON(raw);
 
       var scores = evaluation.scores || {};

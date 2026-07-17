@@ -39,6 +39,7 @@ function embed(text) {
       },
       timeout: 15000
     }, function (res) {
+      res.setEncoding('utf8'); // 防止多字节字符被 chunk 边界切断产生乱码
       var data = '';
       res.on('data', function (chunk) { data += chunk; });
       res.on('end', function () {
@@ -93,6 +94,7 @@ function embedBatch(texts, type) {
       },
       timeout: 30000
     }, function (res) {
+      res.setEncoding('utf8'); // 防止多字节字符被 chunk 边界切断产生乱码
       var data = '';
       res.on('data', function (chunk) { data += chunk; });
       res.on('end', function () {

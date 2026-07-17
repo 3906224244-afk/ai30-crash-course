@@ -49,6 +49,7 @@ function chat(systemPrompt, userMessage, opts) {
       },
       timeout: 120000
     }, function (res) {
+      res.setEncoding('utf8'); // 防止多字节字符被 chunk 边界切断产生乱码
       var data = '';
       res.on('data', function (chunk) { data += chunk; });
       res.on('end', function () {
@@ -113,6 +114,7 @@ function chatWithTools(messages, tools, opts) {
       },
       timeout: 120000
     }, function (res) {
+      res.setEncoding('utf8'); // 防止多字节字符被 chunk 边界切断产生乱码
       var data = '';
       res.on('data', function (chunk) { data += chunk; });
       res.on('end', function () {
@@ -181,6 +183,7 @@ function chatStream(systemPrompt, userMessage, opts, onChunk) {
       },
       timeout: 120000
     }, function (res) {
+      res.setEncoding('utf8'); // 防止多字节字符被 chunk 边界切断产生乱码
       var fullText = '';
       var buffer = '';
 

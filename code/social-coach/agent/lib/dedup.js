@@ -6,6 +6,66 @@
  */
 
 var { safeParseJSON } = require('../../cloudfunctions/getSocialAdvice/index.js');
+var fs = require('fs');
+var path = require('path');
+var zhipu = require('../../cloudfunctions/getSocialAdvice/zhipu-embedding.js');
+
+var KB_DIR = path.join(__dirname, '..', 'knowledge-base');
+var SIM_THRESHOLD = 0.5;  // 低于此相似度不视为候选
+var TOP_K = 3;            // 最多送 K 条候选给 LLM 精判
+
+function cosineSim(a, b) {
+  var dot = 0, na = 0, nb = 0;
+  for (var i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
+/**
+ * 与 build-embeddings.js 保持一致的 embedding 输入拼接
+ */
+function embeddingText(r) {
+  return (r.category || '') + ' ' + (r.subcategory || '') + ' ' +
+         (r.condition || '') + ' ' + (r.compact || r.implication || '');
+}
+
+/**
+ * 向量粗筛：新规则 embedding vs 知识库预计算 embedding，取相似度 top-K 作候选
+ * （原实现为 category+subcategory 字符串精确匹配——提取Agent每次自由命名，
+ *   永远匹配不上，导致 LLM 精判从未被触发）
+ */
+async function vectorCoarseFilter(rule, existingKB) {
+  var isAsk = !!rule.suggested_questions;
+  var embPath = path.join(KB_DIR, (isAsk ? 'ask' : 'generate') + '-embeddings.json');
+
+  var kbEmbeddings;
+  try {
+    kbEmbeddings = JSON.parse(fs.readFileSync(embPath, 'utf-8'));
+  } catch (e) {
+    console.log('    ⚠️ 读取预计算向量失败，降级为无候选:', e.message);
+    return [];
+  }
+  if (kbEmbeddings.length !== existingKB.length) {
+    console.log('    ⚠️ 向量数(' + kbEmbeddings.length + ')与规则数(' + existingKB.length + ')不匹配，降级为无候选（请先跑 build-embeddings.js）');
+    return [];
+  }
+
+  var queryVec = await zhipu.embed(embeddingText(rule));
+
+  var scored = existingKB.map(function (r, idx) {
+    return { rule: r, sim: cosineSim(queryVec, kbEmbeddings[idx]) };
+  }).sort(function (a, b) { return b.sim - a.sim; });
+
+  var top = scored.slice(0, TOP_K).filter(function (s) { return s.sim >= SIM_THRESHOLD; });
+  console.log('    粗筛相似度: ' + scored.slice(0, TOP_K).map(function (s) {
+    return s.rule.subcategory + '=' + s.sim.toFixed(3);
+  }).join(' | '));
+
+  return top.map(function (s) { return s.rule; });
+}
 
 /**
  * @param {Array} newRules       - 新提取的规则数组
@@ -36,10 +96,8 @@ async function dedup(newRules, existingKB, deepseek, prompts) {
       continue;
     }
 
-    // 先做粗筛：同 category 的规则才对比
-    var candidates = existingKB.filter(function (r) {
-      return r.category === rule.category && r.subcategory === rule.subcategory;
-    });
+    // 粗筛：向量相似度取 top-K 相近规则作为候选
+    var candidates = await vectorCoarseFilter(rule, existingKB);
 
     if (candidates.length === 0) {
       console.log('  [' + (i + 1) + '] 全新场景 → 入库');
@@ -59,7 +117,8 @@ async function dedup(newRules, existingKB, deepseek, prompts) {
     ].join('\n');
 
     try {
-      var raw = await deepseek.chat(prompts.PHASE4_DEDUP, userMsg, { maxTokens: 512 });
+      // 精判是评价任务，用标准模型（推理模型思考token会吃掉输出额度导致JSON截断）
+      var raw = await deepseek.chat(prompts.PHASE4_DEDUP, userMsg, { maxTokens: 2048, model: deepseek.FAST_MODEL });
       var judgment = safeParseJSON(raw);
 
       switch (judgment.relation) {
@@ -97,35 +156,40 @@ async function dedup(newRules, existingKB, deepseek, prompts) {
 }
 
 /**
- * 合并两条规则——以现有规则为底，补充新规则的细节
+ * 合并两条规则——以现有规则为底，做"并集"合并，绝不整体替换
+ * （condition/tactical_note 拼接保留双方；数组字段按内容去重后追加）
  */
 function mergeRules(existing, supplement) {
   var merged = JSON.parse(JSON.stringify(existing));
 
-  // condition: 如果新规则的更具体，采用新的
-  if (supplement.condition && supplement.condition.length > merged.condition.length) {
-    merged.condition = supplement.condition;
+  // condition: 并集——保留原触发场景，追加新场景（不做长度替换，否则会丢失原入口）
+  if (supplement.condition && supplement.condition !== merged.condition) {
+    merged.condition = merged.condition + '。另一类触发场景：' + supplement.condition;
   }
 
   // implication: 如果新规则有新的洞察角度，追加
   if (supplement.implication && supplement.implication !== merged.implication) {
-    merged.implication = merged.implication + '；' + supplement.implication;
+    merged.implication = (merged.implication ? merged.implication + '；' : '') + supplement.implication;
   }
 
-  // tactical_note: 保留更具体的
-  if (supplement.tactical_note && supplement.tactical_note.length > merged.tactical_note.length) {
-    merged.tactical_note = supplement.tactical_note;
+  // tactical_note: 并集追加
+  if (supplement.tactical_note && supplement.tactical_note !== merged.tactical_note) {
+    merged.tactical_note = (merged.tactical_note ? merged.tactical_note + '；' : '') + supplement.tactical_note;
   }
 
-  // avoid: 合并去重
-  var existingAvoid = merged.avoid || [];
-  var newAvoid = supplement.avoid || [];
-  newAvoid.forEach(function (item) {
-    if (existingAvoid.indexOf(item) === -1) {
-      existingAvoid.push(item);
-    }
+  // 数组字段: 按内容去重后追加（avoid/雷区、Ask三件套、Generate策略）
+  ['avoid', 'key_dimensions', 'suggested_questions', 'question_pitfalls', 'strategies'].forEach(function (field) {
+    var newItems = supplement[field] || [];
+    if (newItems.length === 0) return;
+    var existingItems = merged[field] || [];
+    var seen = existingItems.map(function (x) { return JSON.stringify(x); });
+    newItems.forEach(function (item) {
+      if (seen.indexOf(JSON.stringify(item)) === -1) {
+        existingItems.push(item);
+      }
+    });
+    merged[field] = existingItems;
   });
-  merged.avoid = existingAvoid;
 
   merged._mergedFrom = supplement;  // 保留来源追溯
 

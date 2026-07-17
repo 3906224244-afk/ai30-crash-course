@@ -51,6 +51,7 @@ function chat(systemPrompt, userMessage) {
       },
       timeout: 30000
     }, function (res) {
+      res.setEncoding('utf8'); // 防止多字节字符被 chunk 边界切断
       var data = '';
       res.on('data', function (chunk) { data += chunk; });
       res.on('end', function () {

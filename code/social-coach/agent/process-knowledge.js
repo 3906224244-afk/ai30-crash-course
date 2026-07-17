@@ -208,7 +208,8 @@ async function extractAskRules(article, estimate, seed) {
 
   var rules = [];
   try {
-    var raw = await deepseek.chat(systemPrompt, userMsg, { maxTokens: 4096 });
+    var raw = await deepseek.chat(systemPrompt, userMsg, { maxTokens: 8192 })
+      .catch(function () { return deepseek.chat(systemPrompt, userMsg, { maxTokens: 8192 }); }); // 网络抖动重试1次
     var result = safeParseJSON(raw);
     rules = result.rules || [];
     console.log('  提取到', rules.length, '条 Ask 规则');
@@ -293,7 +294,8 @@ async function extractGenerateRules(article, estimate, seed) {
 
   var rules = [];
   try {
-    var raw = await deepseek.chat(systemPrompt, userMsg, { maxTokens: 4096 });
+    var raw = await deepseek.chat(systemPrompt, userMsg, { maxTokens: 8192 })
+      .catch(function () { return deepseek.chat(systemPrompt, userMsg, { maxTokens: 8192 }); }); // 网络抖动重试1次
     var result = safeParseJSON(raw);
     rules = result.rules || [];
     console.log('  提取到', rules.length, '条 Generate 规则');
