@@ -13,6 +13,7 @@ Page({
       totalStrategies: 0
     },
     savedStrategies: [],
+    consultHistory: [],
     dailyTip: ''
   },
 
@@ -33,6 +34,7 @@ Page({
   refreshAll() {
     this.refreshProfile();
     this.refreshStats();
+    this.refreshHistory();
     this.refreshSaved();
     this.refreshDailyTip();
   },
@@ -73,20 +75,20 @@ Page({
 
   refreshStats() {
     var history = wx.getStorageSync('consultHistory') || [];
-    var saved = wx.getStorageSync('savedStrategies') || [];
 
     // 过去7天的咨询次数
     var now = Date.now();
     var sevenDaysAgo = now - 7 * 24 * 3600 * 1000;
     var weekly = history.filter(function (h) {
-      return h.timestamp && h.timestamp > sevenDaysAgo;
+      return (h.id || h.timestamp) && (h.id || h.timestamp) > sevenDaysAgo;
     });
 
     // 最常遇到的场景
     var sceneCount = {};
     history.forEach(function (h) {
-      if (h.scene) {
-        sceneCount[h.scene] = (sceneCount[h.scene] || 0) + 1;
+      var label = h.contextLabel || h.scene;
+      if (label) {
+        sceneCount[label] = (sceneCount[label] || 0) + 1;
       }
     });
     var topScene = '';
@@ -103,9 +105,31 @@ Page({
         weeklyCount: weekly.length,
         topScene: topScene || '--',
         totalStrategies: history.reduce(function (sum, h) {
-          return sum + (h.strategyCount || 0);
+          return sum + (h.strategies ? h.strategies.length : (h.strategyCount || 0));
         }, 0)
       }
+    });
+  },
+
+  /* ========== 历史咨询 ========== */
+
+  refreshHistory() {
+    var history = wx.getStorageSync('consultHistory') || [];
+    this.setData({ consultHistory: history });
+  },
+
+  viewHistoryDetail(e) {
+    var index = e.currentTarget.dataset.index;
+    var item = this.data.consultHistory[index];
+    if (!item) return;
+    var parts = item.strategies.map(function (s, i) {
+      return (i + 1) + '. ' + s.typeLabel + '\n' + s.script;
+    });
+    wx.showModal({
+      title: item.contextLabel + ' · ' + item.date,
+      content: parts.join('\n\n') || '暂无内容',
+      showCancel: false,
+      confirmText: '知道了'
     });
   },
 

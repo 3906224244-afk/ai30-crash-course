@@ -69,7 +69,31 @@
       </view>
     </view>
 
-    <!-- ===== 3. 收藏夹预览 ===== -->
+    <!-- ===== 3. 历史咨询 ===== -->
+    <view class="section-card history-card" wx:if="{{consultHistory.length > 0}}">
+      <view class="section-head-row">
+        <image class="section-dot" src="/images/ui-clock.svg" mode="aspectFit" />
+        <text class="section-label">历史咨询</text>
+      </view>
+      <view class="history-list">
+        <view
+          class="history-item"
+          wx:for="{{consultHistory}}"
+          wx:key="id"
+          data-index="{{index}}"
+          bindtap="viewHistoryDetail"
+        >
+          <view class="history-top">
+            <text class="history-label">{{item.contextLabel}}</text>
+            <text class="history-date">{{item.date}}</text>
+          </view>
+          <text class="history-question">{{item.question}}…</text>
+          <text class="history-count">{{item.strategies.length}} 条策略</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 4. 收藏夹预览 ===== -->
     <view class="section-card saved-card" wx:if="{{savedStrategies.length > 0}}">
       <view class="section-head-row">
         <image class="section-dot" src="/images/ui-star.svg" mode="aspectFit" />

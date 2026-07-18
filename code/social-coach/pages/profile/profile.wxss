@@ -159,6 +159,51 @@
   transform: rotate(-0.3deg);
 }
 
+/* 历史咨询 */
+.history-list {
+  margin-top: 8rpx;
+}
+
+.history-item {
+  padding: 20rpx 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.history-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.history-date {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+}
+
+.history-question {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.history-count {
+  font-size: 22rpx;
+  color: var(--accent);
+}
+
 /* 收藏夹 — 左边暖黄条 */
 .section-card.saved-card {
   border-left: 6rpx solid var(--accent-warm);

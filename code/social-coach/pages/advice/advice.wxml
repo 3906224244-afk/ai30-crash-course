@@ -34,6 +34,7 @@
         <view class="w-dot"></view>
       </view>
       <text class="waiting-text">正在分析你的情况</text>
+      <text class="waiting-progress">第 {{currentQIndex + 1}} / {{totalQuestions}} 题</text>
     </view>
 
     <!-- 自由叙述 -->

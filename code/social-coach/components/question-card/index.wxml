@@ -30,12 +30,16 @@
       </view>
     </view>
 
-    <!-- 语音引导 -->
-    <view class="voice-guide" wx:if="{{showVoiceGuide}}">
-      <image class="voice-icon" src="/images/ui-mic.svg" mode="aspectFit" />
-      <text class="voice-title">请直接对微信说出你的回答</text>
-      <text class="voice-hint">点击下方按钮后，用语音描述你的具体情况</text>
-    </view>
+    <!-- D选项自定义输入 -->
+    <textarea
+      class="custom-input"
+      wx:if="{{showCustomInput}}"
+      placeholder="在这里输入你的回答……"
+      value="{{customText}}"
+      auto-height
+      maxlength="300"
+      bindinput="onCustomInput"
+    />
 
     <!-- 操作按钮 -->
     <view class="action-row">

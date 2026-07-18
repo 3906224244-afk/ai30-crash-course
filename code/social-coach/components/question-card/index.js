@@ -38,7 +38,8 @@ Component({
 
     // 交互状态
     selectedIndex: -1,
-    showVoiceGuide: false,
+    showCustomInput: false,
+    customText: '',
     // 进度条宽度（px），在 attached 中根据实际容器宽度计算
     progressMaxWidth: 280
   },
@@ -69,7 +70,8 @@ Component({
 
             // 重置交互状态
             selectedIndex: -1,
-            showVoiceGuide: false
+            showCustomInput: false,
+            customText: ''
           });
 
           viewCtx.setRelatedPage({
@@ -107,17 +109,22 @@ Component({
 
       this.setData({ selectedIndex: index });
 
-      // D 选项 → 展示语音引导，用户直接对微信AI说话
+      // D 选项 → 展示自定义输入框
       if (label === 'D') {
-        this.setData({ showVoiceGuide: true });
+        this.setData({ showCustomInput: true });
       } else {
-        this.setData({ showVoiceGuide: false });
+        this.setData({ showCustomInput: false, customText: '' });
       }
     },
 
     /** 返回上一题 */
     onBackChoice: function () {
       this.triggerEvent('back', { questionIndex: this.data.questionIndex });
+    },
+
+    /** D 选项自定义输入 */
+    onCustomInput: function (e) {
+      this.setData({ customText: e.detail.value });
     },
 
     /** 提交答案 */
@@ -129,7 +136,7 @@ Component({
       var answerText = opt.text;
 
       if (label === 'D') {
-        answerText = '用户将直接对微信AI说出自定义回答';
+        answerText = this.data.customText || '用户自行描述';
       }
 
       if (this.data._modelCtx) {

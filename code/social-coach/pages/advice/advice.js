@@ -428,8 +428,38 @@ Page({
           strategies: revealed.slice(),
           allStrategiesReady: isAll
         });
+        // 全部揭示完成后保存咨询记录
+        if (isAll) {
+          that._saveHistory(card.contextLabel, allStrategies);
+        }
       }, 500 + i * 700);
     });
+  },
+
+  _saveHistory: function (contextLabel, strategies) {
+    var record = {
+      id: Date.now(),
+      date: this._formatDate(new Date()),
+      contextLabel: contextLabel || '社交咨询',
+      question: (this.data.answers.length > 0 ? this.data.answers[0].answer : '').substring(0, 80),
+      strategies: strategies.map(function (s) {
+        return { typeLabel: s.typeLabel, script: s.script };
+      })
+    };
+    try {
+      var history = wx.getStorageSync('consultHistory') || [];
+      history.unshift(record);
+      if (history.length > 20) history = history.slice(0, 20);
+      wx.setStorageSync('consultHistory', history);
+    } catch (e) {}
+  },
+
+  _formatDate: function (d) {
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    var h = d.getHours();
+    var min = d.getMinutes();
+    return m + '/' + day + ' ' + (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
   },
 
   /* ========== 生成策略 ========== */
