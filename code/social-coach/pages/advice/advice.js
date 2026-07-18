@@ -34,7 +34,8 @@ Page({
     questionType: 'free',
     showOptions: false,
     freeText: '',
-    cloudAvailable: true
+    cloudAvailable: true,
+    canGoBack: false
   },
 
   onLoad: function () {
@@ -113,6 +114,7 @@ Page({
       questionType: 'free',
       questions: [{ type: 'free', text: '把你知道的都告诉我吧' }],
       totalQuestions: 5,
+      canGoBack: false,
       sceneChips: this.data.sceneChips.map(function (c) {
         return { id: c.id, label: c.label, icon: c.icon, color: c.color, active: false };
       }),
@@ -279,6 +281,24 @@ Page({
     this.advanceQuestion(q, '跳过');
   },
 
+  onGoBack: function () {
+    var prevIndex = this.data.currentQIndex - 1;
+    if (prevIndex < 0) return;
+
+    var answers = this.data.answers.slice(0, -1);  // 去掉最后一个回答
+    var prevQ = this.data.questions[prevIndex];
+
+    this.setData({
+      currentQIndex: prevIndex,
+      answers: answers,
+      canGoBack: prevIndex > 0,
+      isLastQuestion: false,
+      questionType: prevQ.type,
+      showOptions: prevQ.type === 'choice',
+      freeText: prevQ.type === 'free' ? (answers.length > 0 ? answers[answers.length - 1]?.answer || '' : '') : this.data.freeText
+    });
+  },
+
   advanceQuestion: function (q, answer) {
     var that = this;
     var answers = this.data.answers.concat([{
@@ -333,6 +353,7 @@ Page({
 
         that.setData({
           answers: answers, currentQIndex: nextIndex,
+          canGoBack: nextIndex > 0,
           isLastQuestion: card.isLast || false,
           questionType: card.questionType,
           showOptions: card.questionType === 'choice',
@@ -365,6 +386,7 @@ Page({
     } else {
       this.setData({
         answers: answers, currentQIndex: nextIndex,
+        canGoBack: nextIndex > 0,
         isLastQuestion: nextIndex === qs.length - 1,
         questionType: qs[nextIndex].type, showOptions: qs[nextIndex].type === 'choice'
       });
@@ -374,22 +396,39 @@ Page({
   /* ========== 展示策略 ========== */
 
   showStrategies: function (result, answers) {
+    var that = this;
     var card = result.card;
+    var allStrategies = (card.strategies || []).map(function (s, i) {
+      return {
+        typeKey: s.typeKey || ('llm_' + i),
+        typeLabel: s.typeLabel || ('策略' + (i + 1)),
+        script: s.script || '',
+        rhythm: s.rhythm || '',
+        counterQuestion: s.counterQuestion || s.counterPrediction || '',
+        risk: s.risk || '',
+        strategicNote: s.strategicNote || ''
+      };
+    });
+
     this.setData({
       step: 3,
       answers: answers,
       contextLabel: card.contextLabel || '社交咨询',
-      strategies: (card.strategies || []).map(function (s, i) {
-        return {
-          typeKey: s.typeKey || ('llm_' + i),
-          typeLabel: s.typeLabel || ('策略' + (i + 1)),
-          script: s.script || '',
-          rhythm: s.rhythm || '',
-          counterQuestion: s.counterQuestion || s.counterPrediction || '',
-          risk: s.risk || '',
-          strategicNote: s.strategicNote || ''
-        };
-      })
+      strategies: [],
+      strategyCount: allStrategies.length,
+      allStrategiesReady: false
+    });
+
+    var revealed = [];
+    allStrategies.forEach(function (s, i) {
+      setTimeout(function () {
+        revealed.push(s);
+        var isAll = revealed.length === allStrategies.length;
+        that.setData({
+          strategies: revealed.slice(),
+          allStrategiesReady: isAll
+        });
+      }, 500 + i * 700);
     });
   },
 
@@ -451,7 +490,7 @@ Page({
       currentQIndex: 0, answers: [], strategies: [],
       isLastQuestion: false, contextLabel: '',
       activeScene: '', freeText: '',
-      totalQuestions: 5, questionType: 'free', showOptions: false, cloudAvailable: true,
+      totalQuestions: 5, questionType: 'free', showOptions: false, cloudAvailable: true, canGoBack: false,
       sceneChips: this.data.sceneChips.map(function (c) {
         return { id: c.id, label: c.label, icon: c.icon, color: c.color, active: false };
       })

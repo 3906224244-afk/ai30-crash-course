@@ -1,0 +1,55 @@
+{
+  "apis": [
+    {
+      "name": "getSocialAdvice",
+      "description": "【多轮对话工具】当用户描述社交场景、需要回复建议时调用。首次调用传answers=[]，工具返回追问卡片。用户回答后，必须再次调用本工具，且answers参数要累积前一轮的Q&A（不能只传最新一轮）。追问最多4轮，第5轮后工具自动返回策略结果。典型触发：用户说'帮我回一下'、'怎么跟他说'、'帮我措个辞'。如果用户只是询问社交规则行情（如'随份子多少钱'）而不涉及回复具体的人——用querySocialRule。",
+      "_meta": {
+        "ui": {
+          "componentPath": "../../components/question-card/index",
+          "pagePath": "/pages/advice/advice"
+        }
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "situation": {
+            "type": "string",
+            "description": "用户首次描述的社交场景原文+后续各轮补充的回答内容，全部拼接在一起。每次调用时带上此前积累的所有信息。"
+          },
+          "answers": {
+            "type": "array",
+            "description": "【关键：必须累积历史所有轮次的Q&A】每次调用都要把之前所有轮的问答题一起传入，不能只传最新一轮。首次调用时传空数组[]，之后每次在前一轮answers基础上追加新的一对。",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": { "type": "string", "description": "工具上一轮问的问题原文" },
+                "answer": { "type": "string", "description": "用户这一轮的回答原文" }
+              },
+              "required": ["question", "answer"]
+            }
+          },
+          "phase": {
+            "type": "string",
+            "enum": ["split", "ask", "generate", "auto"],
+            "description": "当前阶段。split=刚进入尚未描述场景；ask=信息收集中需继续追问；generate=信息齐全可生成策略；auto=自动判断。"
+          },
+          "profile": {
+            "type": "object",
+            "description": "用户预存的人设信息（lifeStage等）。通过小程序storage读取。未设置人设时传{}。禁止编造。"
+          }
+        },
+        "required": ["situation", "phase"]
+      }
+    }
+  ],
+  "components": [
+    {
+      "path": "../../components/question-card/index",
+      "relatedPage": "/pages/advice/advice"
+    },
+    {
+      "path": "../../components/strategy-list-card/index",
+      "relatedPage": "/pages/advice/advice"
+    }
+  ]
+}

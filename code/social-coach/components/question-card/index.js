@@ -25,7 +25,8 @@ Component({
     text:           { type: String, value: '' },
     options:        { type: Array,  value: [] },
     directionHints: { type: Array,  value: [] },
-    isLast:         { type: Boolean, value: false }
+    isLast:         { type: Boolean, value: false },
+    canGoBack:      { type: Boolean, value: false }
   },
 
   data: {
@@ -33,6 +34,7 @@ Component({
     _viewCtx:  null,
     _maxHeight: 310,
     cardId: '',
+    _prevAnswers: [],
 
     // 交互状态
     selectedIndex: -1,
@@ -63,6 +65,7 @@ Component({
             directionHints: sc.directionHints || [],
             isLast:         sc.isLast         || false,
             cardId:         meta.id           || 'question-' + Date.now(),
+            _prevAnswers:   sc._answers       || [],
 
             // 重置交互状态
             selectedIndex: -1,
@@ -112,6 +115,11 @@ Component({
       }
     },
 
+    /** 返回上一题 */
+    onBackChoice: function () {
+      this.triggerEvent('back', { questionIndex: this.data.questionIndex });
+    },
+
     /** 提交答案 */
     onSubmitChoice: function () {
       var opt = this.data.options[this.data.selectedIndex];
@@ -125,17 +133,19 @@ Component({
       }
 
       if (this.data._modelCtx) {
+        // 累积历史答案：上次的 _prevAnswers + 本轮新答案
+        var allAnswers = (this.data._prevAnswers || []).concat([{
+          question: this.data.text,
+          answer: label === 'D' ? '' : answerText
+        }]);
         this.data._modelCtx.sendFollowUpMessage({
           content: [
-            { type: 'text', text: '用户回答了第' + this.data.questionIndex + '题(' + label + ')：' + answerText },
+            { type: 'text', text: '用户回答了第' + this.data.questionIndex + '题' },
             { type: 'api/call', data: {
               name: 'getSocialAdvice',
               arguments: {
-                phase: 'ask',
-                answers: [{
-                  question: this.data.text,
-                  answer: label === 'D' ? '' : answerText
-                }]
+                phase: this.data.isLast ? 'generate' : 'ask',
+                answers: allAnswers
               }
             }}
           ]
@@ -153,6 +163,10 @@ Component({
     /** 跳过当前问题 */
     onSkipChoice: function () {
       if (this.data._modelCtx) {
+        var allAnswers = (this.data._prevAnswers || []).concat([{
+          question: this.data.text,
+          answer: ''
+        }]);
         this.data._modelCtx.sendFollowUpMessage({
           content: [
             { type: 'text', text: '用户跳过了第' + this.data.questionIndex + '题' },
@@ -160,10 +174,7 @@ Component({
               name: 'getSocialAdvice',
               arguments: {
                 phase: 'ask',
-                answers: [{
-                  question: this.data.text,
-                  answer: ''
-                }]
+                answers: allAnswers
               }
             }}
           ]
@@ -180,17 +191,18 @@ Component({
     /** 提交自由补充（引导语音） */
     onSubmitFree: function () {
       if (this.data._modelCtx) {
+        var allAnswers = (this.data._prevAnswers || []).concat([{
+          question: this.data.text,
+          answer: '用户已完成补充'
+        }]);
         this.data._modelCtx.sendFollowUpMessage({
           content: [
-            { type: 'text', text: '用户完成自由补充（语音输入），请求生成结果' },
+            { type: 'text', text: '用户完成自由补充' },
             { type: 'api/call', data: {
               name: 'getSocialAdvice',
               arguments: {
-                phase: 'generate',
-                answers: [{
-                  question: this.data.text,
-                  answer: '用户通过语音补充'
-                }]
+                phase: this.data.isLast ? 'generate' : 'ask',
+                answers: allAnswers
               }
             }}
           ]
@@ -206,17 +218,18 @@ Component({
     /** 跳过自由补充（直接生成） */
     onSkipFree: function () {
       if (this.data._modelCtx) {
+        var allAnswers = (this.data._prevAnswers || []).concat([{
+          question: this.data.text,
+          answer: ''
+        }]);
         this.data._modelCtx.sendFollowUpMessage({
           content: [
-            { type: 'text', text: '用户跳过了自由补充，直接请求生成结果' },
+            { type: 'text', text: '用户跳过自由补充' },
             { type: 'api/call', data: {
               name: 'getSocialAdvice',
               arguments: {
-                phase: 'generate',
-                answers: [{
-                  question: this.data.text,
-                  answer: ''
-                }]
+                phase: this.data.isLast ? 'generate' : 'ask',
+                answers: allAnswers
               }
             }}
           ]

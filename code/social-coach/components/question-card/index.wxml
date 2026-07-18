@@ -39,10 +39,6 @@
 
     <!-- 操作按钮 -->
     <view class="action-row">
-      <view class="btn-outline" bindtap="onSkipChoice">
-        <image class="btn-bg-img" src="/images/btn-small-bg.png" mode="aspectFill" />
-        <text>跳过</text>
-      </view>
       <view class="btn-primary btn-submit {{selectedIndex === -1 ? 'disabled' : ''}}" bindtap="onSubmitChoice">
         <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
         <text>{{isLast ? '查看结果' : '下一题'}}</text>
@@ -68,10 +64,6 @@
     </view>
 
     <view class="action-row">
-      <view class="btn-outline" bindtap="onSkipFree">
-        <image class="btn-bg-img" src="/images/btn-small-bg.png" mode="aspectFill" />
-        <text>跳过补充</text>
-      </view>
       <view class="btn-primary btn-submit" bindtap="onSubmitFree">
         <image class="btn-bg-img" src="/images/btn-primary-bg.png" mode="aspectFill" />
         <text>查看结果</text>

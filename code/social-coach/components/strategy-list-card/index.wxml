@@ -99,7 +99,7 @@ module.exports = { truncate: truncate };
           </view>
         </view>
 
-        <view class="strategy-note">
+        <view class="strategy-note" wx:if="{{item.strategicNote}}">
           <image class="meta-icon" src="/images/strategy-note.svg" mode="aspectFit" />
           <text class="note-label">战略标注</text>
           <text class="note-text">{{item.strategicNote}}</text>

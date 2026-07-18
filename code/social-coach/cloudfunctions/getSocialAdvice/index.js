@@ -489,6 +489,7 @@ exports.main = async function (event, context) {
         fact: '用户已输入初步场景：' + (situation || '').substring(0, 100) + '。引导自由叙述完整情况。',
         action: '展示自由叙述卡片。用户提交后继续追问（phase=ask）。',
         card: {
+          _answers: answers,
           type: 'question', questionType: 'free',
           questionIndex: 1,
           totalQuestions: 5,   // 1轮自由叙述 + 最多4轮选择题
@@ -526,6 +527,7 @@ exports.main = async function (event, context) {
               fact: '已收集' + answers.length + '轮信息。当前追问：' + (question.text || '').substring(0, 30) + '...',
               action: '展示追问卡片。用户选择后继续调用本工具，phase=ask。',
               card: {
+                _answers: answers,
                 type: 'question', questionType: 'choice',
                 questionIndex: answers.length + 1,
                 totalQuestions: 5,
@@ -571,6 +573,7 @@ exports.main = async function (event, context) {
         fact: '正在收集信息（硬编码fallback）。当前追问维度：' + currentGap.key + '。',
         action: '展示追问卡片。用户选择后继续调用本工具，phase=ask。',
         card: {
+          _answers: answers,
           type: 'question', questionType: 'choice',
           questionIndex: answers.length + 1,
           totalQuestions: 5,
@@ -600,7 +603,7 @@ exports.main = async function (event, context) {
             rhythm: s.rhythm || '',
             counterQuestion: s.counterPrediction || '',
             risk: s.risk || '',
-            strategicNote: ''
+            strategicNote: s.strategicNote || ''
           };
         });
 

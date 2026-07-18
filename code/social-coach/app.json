@@ -43,13 +43,20 @@
   },
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",
+  "subPackages": [
+    {
+      "root": "skill/social-coach",
+      "independent": true,
+      "pages": []
+    }
+  ],
   "sitemapLocation": "sitemap.json",
   "agent": {
     "skills": [
       {
         "name": "social-coach",
         "description": "人情世故顾问——为20-30岁年轻人提供定制化社交回复策略。用户描述社交困境后，AI先让用户自由叙述完整情况，再追问最多4道选择题补缺口，最后生成3-5条不同博弈姿态的回复方案（含话术/节奏/风险预判）。",
-        "path": "."
+        "path": "skill/social-coach"
       }
     ]
   }

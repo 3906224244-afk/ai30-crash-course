@@ -150,7 +150,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 40rpx 40rpx 48rpx;
+  padding: 40rpx 40rpx 150rpx;
 }
 
 .chat-progress {
@@ -230,13 +230,13 @@
 /* 输入区 — 手绘边框 */
 .chat-input {
   width: 100%;
-  min-height: 200rpx;
+  min-height: 280rpx;
+  max-height: 560rpx;
   padding: 24rpx;
   font-size: 30rpx;
   color: var(--text-primary);
   line-height: 1.8;
   box-sizing: border-box;
-  flex: 1;
   border: 1.5px dashed var(--border);
   border-radius: 16rpx 24rpx 12rpx 22rpx;
   background: var(--bg-card);
@@ -244,24 +244,27 @@
 
 /* 提交按钮 */
 .chat-submit {
-  height: 88rpx;
+  height: 100rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-top: auto;
+  margin: 32rpx auto 0;
   transform: translate(0, 0) rotate(-0.3deg);
   transition: transform 0.08s ease, box-shadow 0.08s ease;
+  width: 400rpx;
 }
 
 .chat-submit text {
+  position: relative;
+  z-index: 1;
   font-size: 30rpx;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #2D2D2D;
   letter-spacing: 1rpx;
 }
 
@@ -359,10 +362,15 @@
 
 .reset-row {
   padding: 40rpx 32rpx;
+  display: flex;
+  justify-content: center;
 }
 
 .reset-btn-full {
-  width: 100%;
-  height: 88rpx;
+  width: auto;
+  max-width: 90%;
+  height: 76rpx;
+  padding: 0 40rpx;
   font-size: 28rpx;
+  transform: rotate(0.1deg);
 }
