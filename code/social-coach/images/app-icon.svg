@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
+  <!-- 暖色渐变背景 -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5E6D3"/>
+      <stop offset="100%" style="stop-color:#E8D5B7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角方形背景 -->
+  <rect width="144" height="144" rx="28" fill="url(#bg)"/>
+
+  <!-- 对话气泡 -->
+  <rect x="28" y="34" width="76" height="54" rx="18" fill="#FFF" opacity="0.9"/>
+  <!-- 气泡尾巴 -->
+  <polygon points="46,88 29,102 58,98" fill="#FFF" opacity="0.9"/>
+
+  <!-- 气泡内三条短线（代表文字/信息） -->
+  <rect x="44" y="50" width="44" height="4" rx="2" fill="#C4A97D"/>
+  <rect x="44" y="60" width="32" height="4" rx="2" fill="#C4A97D"/>
+  <rect x="44" y="70" width="38" height="4" rx="2" fill="#C4A97D"/>
+
+  <!-- 右上角小星星（妙招） -->
+  <polygon points="108,24 111,34 121,34 113,40 116,50 108,44 100,50 103,40 95,34 105,34"
+           fill="#D4A853" opacity="0.8"/>
+</svg>

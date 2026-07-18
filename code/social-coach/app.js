@@ -3,7 +3,7 @@ App({
     // 初始化云开发（正式环境需要配置真实环境ID）
     if (wx.cloud) {
       wx.cloud.init({
-        env: 'social-coach-dev',
+        env: 'cloud1-d0g6rvd87c8980c04',
         traceUser: true
       });
     }

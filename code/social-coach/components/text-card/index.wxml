@@ -1,5 +1,0 @@
-<view class="card-container" style="max-height: {{_maxHeight}}px;" bindtap="onTapCard">
-  <text class="card-title" wx:if="{{title}}">{{title}}</text>
-  <text class="card-body">{{text}}</text>
-  <view class="bottom-fade"></view>
-</view>

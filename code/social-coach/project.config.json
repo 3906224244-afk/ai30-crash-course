@@ -1,10 +1,56 @@
 {
   "description": "人情世故顾问 - 社交场景AI辅助",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "value": "agent",
+        "type": "folder"
+      },
+      {
+        "value": ".claude",
+        "type": "folder"
+      },
+      {
+        "value": "raw-articles",
+        "type": "folder"
+      },
+      {
+        "value": "scripts",
+        "type": "folder"
+      },
+      {
+        "value": "docs",
+        "type": "folder"
+      },
+      {
+        "value": "mcp.json",
+        "type": "file"
+      },
+      {
+        "value": "readme.md",
+        "type": "file"
+      },
+      {
+        "value": "产品需求文档.md",
+        "type": "file"
+      },
+      {
+        "value": ".DS_Store",
+        "type": "suffix"
+      },
+      {
+        "value": "images/app-icon.svg",
+        "type": "file"
+      },
+      {
+        "value": "images/app-icon.png",
+        "type": "file"
+      }
+    ],
     "include": []
   },
   "setting": {
+    "ignoreUploadUnusedFiles": false,
     "bundle": false,
     "userConfirmedBundleSwitch": false,
     "urlCheck": true,
@@ -43,8 +89,8 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.15.1",
-  "appid": "wx9808f947cde21de3",
+  "libVersion": "3.16.2",
+  "appid": "wx0ff7e0f5fa07ff1a",
   "projectname": "social-coach",
   "cloudfunctionRoot": "cloudfunctions/",
   "condition": {},

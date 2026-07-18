@@ -152,6 +152,12 @@ Page({
 
   callDevServer: function (data) {
     return new Promise(function (resolve, reject) {
+      // 只有开发版（工具/预览调试）才走本地 dev server，体验版/正式版直接跳去云函数
+      var envVersion = 'release';
+      try { envVersion = wx.getAccountInfoSync().miniProgram.envVersion; } catch (e) {}
+      if (envVersion !== 'develop') {
+        return reject(new Error('非开发版，跳过 dev server'));
+      }
       wx.request({
         url: DEV_URL + '/',
         method: 'POST',

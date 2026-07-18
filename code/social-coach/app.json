@@ -7,12 +7,8 @@
     "pages/etiquette/etiquette"
   ],
   "usingComponents": {
-    "split-card": "/components/split-card/index",
     "question-card": "/components/question-card/index",
-    "strategy-list-card": "/components/strategy-list-card/index",
-    "knowledge-card": "/components/knowledge-card/index",
-    "text-card": "/components/text-card/index",
-    "grain-field": "/components/grain-field/index"
+    "strategy-list-card": "/components/strategy-list-card/index"
   },
   "window": {
     "navigationBarBackgroundColor": "#FDFBF7",
@@ -46,6 +42,7 @@
     ]
   },
   "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json",
   "agent": {
     "skills": [

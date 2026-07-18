@@ -271,7 +271,6 @@
 }
 
 .submit-off {
-  background-image: url('/images/btn-secondary-bg.png');
   opacity: 0.5;
   box-shadow: none;
   pointer-events: none;
