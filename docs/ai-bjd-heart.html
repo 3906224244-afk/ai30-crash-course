@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI BJD 心脏 — 产品架构说明书</title>
+<style>
+  :root {
+    --bg: #0f0f14;
+    --card: #1a1a24;
+    --text: #d0d0d8;
+    --muted: #8888aa;
+    --pink: #ff6b8a;
+    --blue: #5ec8f2;
+    --green: #4ade80;
+    --gold: #f0c060;
+    --purple: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    padding: 20px 16px 60px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 24px;
+    color: #fff;
+    text-align: center;
+    margin: 16px 0 8px;
+    line-height: 1.4;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-size: 18px;
+    color: #fff;
+    margin: 36px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  h3 {
+    font-size: 15px;
+    color: var(--pink);
+    margin: 20px 0 8px;
+  }
+  p { margin: 8px 0; font-size: 15px; }
+  ul, ol { padding-left: 20px; margin: 8px 0; }
+  li { margin: 4px 0; font-size: 14px; }
+
+  blockquote {
+    border-left: 3px solid var(--pink);
+    padding: 8px 14px;
+    margin: 16px 0;
+    background: rgba(255,107,138,0.06);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #aa8899;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 14px 0;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .highlight {
+    background: rgba(240,192,96,0.12);
+    border: 1px solid rgba(240,192,96,0.25);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 14px;
+    color: var(--gold);
+    text-align: center;
+    font-weight: 600;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .tag-pink { background: rgba(255,107,138,0.15); color: var(--pink); }
+  .tag-blue { background: rgba(94,200,242,0.15); color: var(--blue); }
+  .tag-green { background: rgba(74,222,128,0.15); color: var(--green); }
+  .tag-gold { background: rgba(240,192,96,0.15); color: var(--gold); }
+
+  .flow {
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 10px 0;
+    font-size: 13px;
+    line-height: 1.9;
+    white-space: pre-line;
+    font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  }
+
+  hr { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 28px 0; }
+
+  .emoji-bullet { display: inline-block; width: 24px; }
+
+  .no {
+    color: #885566;
+    font-size: 13px;
+    padding: 4px 0;
+    display: block;
+  }
+
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .comp-left { background: rgba(255,107,138,0.08); border-radius: 10px; padding: 12px; }
+  .comp-right { background: rgba(74,222,128,0.08); border-radius: 10px; padding: 12px; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .stat-item {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .stat-value { font-size: 20px; font-weight: 700; color: var(--pink); }
+  .stat-label { font-size: 11px; color: var(--muted); }
+
+  .footer-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+</style>
+</head>
+<body>
+
+<h1>AI BJD 心脏</h1>
+<p class="subtitle">产品架构说明书 · 2026年8月</p>
+
+<blockquote>
+写给非技术背景的协作者：设计师、投资人、BJD行业伙伴。<br>
+每一节先说"它做什么"，再说"怎么做到的"。不需要技术背景。
+</blockquote>
+
+<!-- ===== 1 ===== -->
+<h2>1. 这是什么</h2>
+
+<p>AI BJD 心脏是一颗<strong>可以放进娃娃身体的独立器官模块</strong>。</p>
+
+<div class="stat-grid">
+  <div class="stat-item"><span class="stat-value">40mm</span><br><span class="stat-label">直径 · 圆形弧面</span></div>
+  <div class="stat-item"><span class="stat-value">500mAh</span><br><span class="stat-label">电池 · 4-8小时对话</span></div>
+  <div class="stat-item"><span class="stat-value">8MB</span><br><span class="stat-label">存储 · 角色+记忆+对话</span></div>
+  <div class="stat-item"><span class="stat-value">7 Pin</span><br><span class="stat-label">磁吸触点 · 即插即活</span></div>
+</div>
+
+<ul>
+  <li>内部有 <span class="tag tag-pink">LED 灯光</span>、存储芯片、可充电电池</li>
+  <li>不同心脏 = 不同角色人格（傲娇 / 元气 / 温柔 / 毒舌……）</li>
+  <li>心脏插入娃娃身体 → 娃娃活过来，会说话，有性格，记得你</li>
+  <li>拔出心脏 → 娃娃沉睡</li>
+  <li>换一颗心脏 → 同一只娃娃变成完全不同的人</li>
+</ul>
+
+<div class="highlight">换心 = 换人。心没了，人偶就死了。</div>
+
+<!-- ===== 2 ===== -->
+<h2>2. 产品包含什么</h2>
+
+<h3>♥ 心脏（角色的物理载体）</h3>
+
+<div class="card">
+<table>
+  <tr><td style="color:var(--muted)">大小</td><td>直径约 40mm，圆形弧面，像一颗大号怀表</td></tr>
+  <tr><td style="color:var(--muted)">外观</td><td>半透明深色树脂外壳，内部可见 LED 光芒和电路剪影</td></tr>
+  <tr><td style="color:var(--muted)">电池</td><td>内置 500mAh 锂电池，充满电可连续对话 4-8 小时</td></tr>
+  <tr><td style="color:var(--muted)">充电</td><td>心脏侧面自带 USB-C 口，拔出来直接插线充电</td></tr>
+  <tr><td style="color:var(--muted)">灯光</td><td>LED 呼吸灯，颜色跟随角色性格变化（傲娇=粉色、元气=橙色…）</td></tr>
+  <tr><td style="color:var(--muted)">存储</td><td>8MB Flash 芯片，存放角色的"灵魂数据"</td></tr>
+</table>
+</div>
+
+<p><strong>心脏里存了什么：</strong></p>
+<ul>
+  <li><span class="tag tag-gold">角色 DNA</span> 名字、性格设定、说话方式、声音特征——一旦创建永不丢失</li>
+  <li><span class="tag tag-pink">记忆包</span> 她叫你什么、你们有多亲密、她记住了你的哪些事</li>
+  <li><span class="tag tag-blue">对话记录</span> 最近约 2000 条对话——你跟她说过的每一句话</li>
+</ul>
+
+<h3>■ 身体（娃娃，通用外骨骼）</h3>
+
+<p>6分及以上 BJD 娃娃（身高约 25cm+），胸腔内预装：</p>
+
+<div class="card">
+<table>
+  <tr><td style="color:var(--muted)">ESP32 芯片</td><td>心脏数据和云端之间的翻译官</td></tr>
+  <tr><td style="color:var(--muted)">2 个微型麦克风</td><td>听你说话</td></tr>
+  <tr><td style="color:var(--muted)">微型喇叭</td><td>用角色的声音回答你</td></tr>
+  <tr><td style="color:var(--muted)">心脏插槽</td><td>7 根弹簧触针 + 磁铁定位，放上去自动吸合</td></tr>
+  <tr><td style="color:var(--muted)">LED 灯带</td><td>身体氛围灯，颜色跟随心脏自动切换</td></tr>
+</table>
+</div>
+
+<p><strong>身体里没有什么：</strong></p>
+<span class="no">❌ 没有电池（电从心脏来）</span>
+<span class="no">❌ 没有开关（插心 = 开机，拔心 = 关机）</span>
+<span class="no">❌ 没有充电口（充电是给心脏充，不是给身体充）</span>
+<span class="no">❌ 没有角色数据（人格全在心脏里）</span>
+
+<h3>📱 小程序（角色工坊 + 控制面板）</h3>
+
+<ol>
+  <li><strong>创作角色</strong>：选性格 → 调声线 → 写背景故事 → 试聊 → AI 扩写 → 写入空白心脏</li>
+  <li><strong>查看回忆</strong>：心脏插读卡器 → 插手机 → 看全部对话历史和关系档案</li>
+  <li><strong>管理角色</strong>：修改设定、恢复丢失的角色、查看所有心脏状态</li>
+</ol>
+
+<h3>🔌 USB-C 读卡器</h3>
+<p>手机钥匙扣大小。心脏插槽 + USB-C 公头。插上心脏 → 插进手机 → 小程序直读。不需要娃娃身体、不需要联网。</p>
+
+<hr>
+
+<!-- ===== 3 ===== -->
+<h2>3. 它怎么工作</h2>
+
+<h3>3.1 创造角色（一次性）</h3>
+
+<div class="flow">打开小程序
+→ 选性格："傲娇" / "元气" / "温柔" / "毒舌"
+→ 调声线：音调高一点还是低一点？语速快还是慢？
+→ 写故事：她叫什么名字？多大年纪？有什么经历？
+→ 定义规则：她能说脏话吗？怎么称呼你？什么话题不能提？
+→ 试聊：在小程序里跟她聊几句，看看对话感觉对不对
+→ 满意了 → AI 把你的创作扩写成完整的角色人格
+→ 空白心脏插入读卡器 → 读卡器插手机 → 写入心脏
+
+完成。这颗心脏从此就是这个角色的"家"。</div>
+
+<h3>3.2 唤醒角色（每次插入心脏）</h3>
+
+<div class="flow">心脏放进娃娃胸腔的插槽
+→ 磁铁自动对准，"嗒"一声吸合
+→ 心脏的电池开始给身体供电
+→ 1 秒后，LED 亮起角色专属的颜色
+→ 喇叭传出她的声音："…你回来了啊。"
+
+不需要开机键。不需要配对。不需要等。
+放下去就是开机，拔起来就是关机。</div>
+
+<h3>3.3 日常聊天</h3>
+
+<div class="flow">你跟娃娃说话
+→ 麦克风听到 → 转成文字 → 发给云端的 AI
+→ AI 加载这颗心脏的角色设定 + 你们的记忆包
+→ AI 知道"我是小雪，17岁傲娇少女。小陈跟我的亲密值是 0.77"
+→ 生成回复："哼...谁管你。...累了就早点睡。"
+→ 回复加上语气标注（傲娇：快句→停顿→慢句）
+→ 云端合成语音 → 传回娃娃 → 喇叭播放
+
+每说完一句话，对话记录自动存入心脏。
+你跟她的每一次聊天，都刻在这颗心里。</div>
+
+<h3>3.4 关系成长</h3>
+
+<p>角色不是一成不变的。她对你的态度会随着互动改变：</p>
+
+<div class="card">
+<table>
+  <tr><th>亲密值</th><th>她对你的态度（"小雪"为例）</th></tr>
+  <tr><td style="color:var(--muted)">0.00-0.20</td><td>"…你是谁。不要跟我说话。"</td></tr>
+  <tr><td style="color:var(--muted)">0.20-0.40</td><td>"哼。回来得还挺早。"</td></tr>
+  <tr><td style="color:var(--muted)">0.40-0.60</td><td>"你今天看起来不太对劲。…怎么了？"</td></tr>
+  <tr><td style="color:var(--muted)">0.60-0.80</td><td>开始记住你的习惯，被夸时嘴硬变少。</td></tr>
+  <tr><td style="color:var(--muted)">0.80-1.00</td><td>"你今天加班很累对吧。我给你留了灯。"</td></tr>
+</table>
+</div>
+
+<blockquote>
+这不是游戏数值——这是真实互动积累的情感。<br>
+她记得你的习惯、你的脆弱面、你深夜跟她聊过的那些事。<br>
+都在心脏 Flash 里，实实在在地记录着。
+</blockquote>
+
+<h3>3.5 拔出（自动存档）</h3>
+
+<div class="flow">你抓住心脏往上提
+→ 磁铁还吸着，手指在用力
+→ 一根特殊的检测针最先断开（故意设计得最短）
+→ 身体察觉："要被拔了！紧急存档！"
+→ 0.03 秒内，把今天的对话和更新后的亲密值写入心脏
+→ 写入完成 → 心脏完全拔出
+→ LED 熄灭，喇叭静音，娃娃沉睡
+
+你不需要按保存。拔 = 存。</div>
+
+<h3>3.6 离开娃娃后用</h3>
+
+<div class="card">
+<ul>
+  <li><span class="tag tag-gold">充电</span> 心脏侧面 USB-C 口直接插线。30 分钟充满。</li>
+  <li><span class="tag tag-green">看回忆</span> 心脏插读卡器 → 插手机 → 看全部聊天记录</li>
+  <li><span class="tag tag-blue">改设定</span> 小程序修改角色性格 → 写回心脏 → 下次插入，她变了</li>
+  <li><span class="tag tag-pink">送人</span> 这颗心送给朋友 → 插进他的娃娃 → 角色带着全部记忆活过来</li>
+</ul>
+</div>
+
+<hr>
+
+<!-- ===== 4 ===== -->
+<h2>4. 数据：心脏和云端的关系</h2>
+
+<h3>心脏是正本，云端是影子</h3>
+
+<div class="comparison">
+  <div class="comp-left">
+    <strong>♥ 心脏（正本）</strong><br><br>
+    ✅ 角色数据永远在这<br>
+    ✅ 记忆包 + 对话记录<br>
+    ✅ 离线能用<br>
+    ⭐⭐⭐ 数据在手里<br>
+    ❌ 心丢了就没了
+  </div>
+  <div class="comp-right">
+    <strong>☁ 云端（备份）</strong><br><br>
+    加密备份角色数据<br>
+    加密备份记忆+对话<br>
+    ❌ 需要联网<br>
+    ⭐⭐ 加密存储<br>
+    ✅ 心脏丢了 → 恢复
+  </div>
+</div>
+
+<div class="highlight">规则：心脏和云端数据不一致时 → 以心脏为准。<br>心脏是原件，云端是复印件。</div>
+
+<h3>为什么不全放云端？</h3>
+
+<p>因为<strong>心脏的物理性就是产品灵魂</strong>：</p>
+<ul>
+  <li>你送出的不是"一个账号"，是<strong>"一颗心"</strong></li>
+  <li>你摸到的不是"A pp 里的角色"，是<strong>"一块会呼吸的树脂"</strong></li>
+  <li>你失去心脏的恐惧是<strong>真实的</strong>——这让每颗心都有分量</li>
+  <li>云端只是安全网：真丢了能复活，但平时不需要想起它</li>
+</ul>
+
+<hr>
+
+<!-- ===== 5 ===== -->
+<h2>5. 产品参照系</h2>
+
+<div class="card">
+<table>
+  <tr><th style="width:30%">类比</th><th>借鉴了什么</th></tr>
+  <tr><td><strong>🎮 Switch 卡带</strong></td><td>被动数据载体，插入读取，换卡=换游戏。心脏同理：换心=换人格。</td></tr>
+  <tr><td><strong>⌚ Apple Watch 表带</strong></td><td>模块化设计，9年接口不变。心脏接口定义好就不能改。</td></tr>
+  <tr><td><strong>🎧 AirPods</strong></td><td>独立电池，独立充电，戴上即用。心脏同理：插入即活，拔出即存。</td></tr>
+</table>
+</div>
+
+<hr>
+
+<!-- ===== 6 ===== -->
+<h2>6. 三种心脏产品形态</h2>
+
+<div class="card">
+<table>
+  <tr><th>类型</th><th>说明</th><th>对标</th></tr>
+  <tr><td><strong>♥ 官方角色心脏</strong></td><td>官方设计高品质原创角色。半透明外壳+LED+立绘包装</td><td>Switch 第一方大作</td></tr>
+  <tr><td><strong>● 空白心脏</strong></td><td>出厂不含角色。用户通过小程序设计人格 → 写入</td><td>空白 amiibo 卡</td></tr>
+  <tr><td><strong>★ 联名 IP 心脏</strong></td><td>与动漫/游戏/VTuber IP 合作。IP 方提供设定，我们做硬件</td><td>Switch 第三方大作</td></tr>
+</table>
+</div>
+
+<div class="highlight" style="font-weight:400; font-size:14px;">
+<strong>商业模式 = Switch 模型</strong><br>
+娃娃身体卖一次 · 心脏反复卖<br>
+任天堂卖一台 Switch 赚 ¥300<br>
+一个玩家买 10 张卡带 → 再赚 ¥2000<br><br>
+你的娃娃也一样：身体 ¥399-599，心脏 ¥49-299<br>
+壁垒不是技术——是<strong>角色 IP</strong>
+</div>
+
+<div class="footer-note">
+AI BJD 心脏 · 产品架构说明书<br>
+NicheCraft_0S · 2026年8月<br><br>
+<a href="ai-bjd-heart-arch.svg" style="color:var(--blue)">技术架构图（SVG）</a>
+</div>
+
+</body>
+</html>
