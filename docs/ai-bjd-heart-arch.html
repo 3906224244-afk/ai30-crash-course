@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+<title>AI BJD 心脏 — 技术架构图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f14;
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+  }
+  .header {
+    padding: 20px 16px 10px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 20px; color: #fff; margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 12px; color: #8888aa;
+  }
+  .hint {
+    font-size: 11px; color: #666688;
+    padding: 8px 12px;
+    background: rgba(240,192,96,0.1);
+    border-radius: 6px;
+    margin: 8px 16px 16px;
+    text-align: center;
+  }
+  .svg-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 4px 40px;
+  }
+  .svg-wrap svg {
+    min-width: 1300px;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .back-link {
+    color: #5ec8f2;
+    font-size: 13px;
+    text-decoration: none;
+    padding: 12px 0 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI BJD 心脏 · 技术架构 V3</h1>
+  <p>6分娃娃（~25cm）· 心脏 40mm · 7-Pin · 电池在心 · 心供电给身体</p>
+</div>
+
+<div class="hint">👆 可双指缩放查看细节 · 左右滑动浏览全图</div>
+
+<div class="svg-wrap">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 1650" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">
+  <rect width="1300" height="1650" fill="#0f0f14"/>
+  <defs>
+    <filter id="gr"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="gb"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="gg"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="d" markerWidth="10" markerHeight="8" refX="5" refY="8" orient="auto"><path d="M0,0 L5,8 L10,0 Z" fill="#f0c060"/></marker>
+  </defs>
+
+  <text x="650" y="38" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">AI BJD 心脏 — 完整架构 V3</text>
+  <text x="650" y="60" text-anchor="middle" fill="#8888aa" font-size="12">6分娃娃（~25cm）· 心脏 40mm · 电池在心 · 心供电给身体 · 拔出=死 · 插入=活</text>
+
+  <!-- 阶段〇：创作 -->
+  <rect x="30" y="78" width="1240" height="165" rx="14" fill="#0d1a14" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="62" y="106" fill="#4ade80" font-size="14" font-weight="bold">阶段〇 · 角色创作（小程序 + 读卡器）</text>
+  <text x="62" y="128" fill="#66aa88" font-size="9">打开小程序 → 选性格基底（傲娇·元气·温柔·毒舌）→ 调声线滑块 → 写角色背景故事 → 定义交互规则 → 试聊验证 → AI扩写成完整System Prompt + 生成heart_id</text>
+  <text x="62" y="146" fill="#66aa88" font-size="9">空白心脏插进 USB-C 读卡器 → 读卡器插手机 → 小程序通过 USB-SPI 把 System Prompt + heart_id + TTS参数 + LED配置 写入心脏 Flash 分区①</text>
+
+  <rect x="62" y="158" width="165" height="36" rx="6" fill="#0d1f18" stroke="#4ade80" stroke-width="0.6"/>
+  <text x="145" y="174" text-anchor="middle" fill="#4ade80" font-size="8" font-weight="bold">📱 小程序创作</text>
+  <text x="145" y="188" text-anchor="middle" fill="#446644" font-size="7">选性格·捏声线·写故事</text>
+  <text x="240" y="178" fill="#4ade80" font-size="14">→</text>
+  <rect x="260" y="158" width="150" height="36" rx="6" fill="#0d1f18" stroke="#4ade80" stroke-width="0.6"/>
+  <text x="335" y="174" text-anchor="middle" fill="#4ade80" font-size="8" font-weight="bold">☁ AI扩写Prompt</text>
+  <text x="335" y="188" text-anchor="middle" fill="#446644" font-size="7">用户创作→人格文本</text>
+  <text x="423" y="178" fill="#4ade80" font-size="14">→</text>
+  <rect x="443" y="158" width="150" height="36" rx="6" fill="#0d1f18" stroke="#4ade80" stroke-width="0.6"/>
+  <text x="518" y="174" text-anchor="middle" fill="#4ade80" font-size="8" font-weight="bold">🔌 USB-C读卡器</text>
+  <text x="518" y="188" text-anchor="middle" fill="#446644" font-size="7">USB-SPI桥接·直写Flash</text>
+  <text x="606" y="178" fill="#4ade80" font-size="14">→</text>
+  <rect x="624" y="154" width="165" height="44" rx="20" fill="#1a3020" stroke="#4ade80" stroke-width="1.5" filter="url(#gg)"/>
+  <text x="707" y="172" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="bold">♥ 心脏就绪</text>
+  <text x="707" y="188" text-anchor="middle" fill="#66aa88" font-size="7">分区①已写入·角色已创建</text>
+
+  <line x1="650" y1="243" x2="650" y2="278" stroke="#f0c060" stroke-width="2.5" marker-end="url(#d)"/>
+
+  <!-- 心脏内部结构 -->
+  <rect x="30" y="288" width="1240" height="235" rx="14" fill="#1a1020" stroke="#ff6b8a" stroke-width="2.5" filter="url(#gr)"/>
+  <text x="62" y="316" fill="#ff6b8a" font-size="15" font-weight="bold">♥ 心脏内部 — 40mm 直径 · 电池在心脏里 · 心脏给身体供电</text>
+  <text x="62" y="336" fill="#885566" font-size="10">心脏 ≠ SD卡。心脏 = 角色灵魂所在的微型计算机 + 电池。有心才有电，有电才有命。</text>
+
+  <rect x="62" y="348" width="380" height="155" rx="10" fill="#0d0d1a" stroke="#ff6b8a" stroke-width="0.8"/>
+  <text x="74" y="368" fill="#ff8fab" font-size="10" font-weight="bold">心脏内部堆叠（侧剖）：</text>
+  <text x="74" y="388" fill="#aa8899" font-size="9">① 半透明树脂外壳（弧形穹顶，透LED光）</text>
+  <text x="74" y="406" fill="#aa8899" font-size="9">② LED 灯珠 WS2812B ×4（呼吸·跳动·变色）</text>
+  <text x="74" y="424" fill="#aa8899" font-size="9">③ Flash 8MB 存储芯片（角色DNA + 记忆 + 对话记录）</text>
+  <text x="74" y="442" fill="#aa8899" font-size="9">④ 锂聚合物电池 403040 · 3.7V · 500mAh（4-8h 连续对话）</text>
+  <text x="74" y="460" fill="#aa8899" font-size="9">⑤ 电源管理 + 充电电路（USB-C母座在心脏侧面）</text>
+  <text x="74" y="478" fill="#f0c060" font-size="9">⑥ 底部：7 pin 金手指触点盘 + 2颗定位磁铁</text>
+
+  <rect x="460" y="348" width="785" height="155" rx="10" fill="#0d0d1a" stroke="#f0c060" stroke-width="1"/>
+  <text x="480" y="368" fill="#f0c060" font-size="10" font-weight="bold">心脏 → 身体：7-Pin Pogo Pin 触点定义（间距 2.54mm，圆环排列）</text>
+  <text x="480" y="392" fill="#f0c060" font-size="9">Pin① GND</text><text x="560" y="392" fill="#8888aa" font-size="9">共地。电流回路的参考零点。</text>
+  <text x="480" y="410" fill="#f0c060" font-size="9">Pin② VOUT</text><text x="560" y="410" fill="#5ec8f2" font-size="9">★ 3.3V 供电（心脏 → 身体）。心脏的电池通过稳压后，从这里送给身体的 ESP32 + 麦克风 + 喇叭。</text>
+  <text x="480" y="428" fill="#f0c060" font-size="9">Pin③ CD#</text><text x="560" y="428" fill="#ff6b8a" font-size="9">★ 拔出检测。心脏内部短接 Pin① GND。插入=低电平"我在"，拔出时最先断开→ESP32中断→紧急存档。</text>
+  <text x="480" y="446" fill="#f0c060" font-size="9">Pin④ SCLK</text><text x="560" y="446" fill="#8888aa" font-size="9">SPI 时钟。ESP32 发出脉冲，控制读写节奏。</text>
+  <text x="480" y="464" fill="#f0c060" font-size="9">Pin⑤ MOSI</text><text x="560" y="464" fill="#8888aa" font-size="9">Master Out Slave In。ESP32 → Flash 的命令线。</text>
+  <text x="480" y="482" fill="#f0c060" font-size="9">Pin⑥ MISO</text><text x="560" y="482" fill="#8888aa" font-size="9">Master In Slave Out。Flash → ESP32 的数据线。</text>
+  <text x="480" y="500" fill="#f0c060" font-size="9">Pin⑦ CS#</text><text x="560" y="500" fill="#8888aa" font-size="9">Chip Select。ESP32拉低=选通Flash开始通信。</text>
+
+  <line x1="650" y1="523" x2="650" y2="558" stroke="#f0c060" stroke-width="2.5" marker-end="url(#d)"/>
+
+  <!-- 阶段一：插入 -->
+  <rect x="30" y="568" width="1240" height="175" rx="14" fill="#0d1a24" stroke="#5ec8f2" stroke-width="1.5"/>
+  <text x="62" y="596" fill="#5ec8f2" font-size="14" font-weight="bold">阶段一 · 心脏插入 = 唤醒（冷启动）</text>
+  <text x="62" y="618" fill="#557788" font-size="9">T=0ms     心脏放进身体插槽 → 磁铁吸合定位 → Pogo Pin 7针依次接触。GND最先接（pin稍长），VOUT紧随。</text>
+  <text x="62" y="636" fill="#557788" font-size="9">T=5ms     3.3V 从心脏电池 → Pin② VOUT → 身体ESP32-S3。身体从完全断电的死状态冷启动。</text>
+  <text x="62" y="654" fill="#557788" font-size="9">T=50ms    ESP32启动完成 → SPI初始化 → 拉低CS# → 读Flash：heart_id + System Prompt + 记忆包</text>
+  <text x="62" y="672" fill="#557788" font-size="9">T=200ms   WiFi连路由器 → HTTPS把heart_id发云端 → 云端查库 → 返回System Prompt + TTS声线 + LED颜色</text>
+  <text x="62" y="690" fill="#557788" font-size="9">T=600ms   I2S音频总线初始化 → LED从灭变粉色呼吸灯</text>
+  <text x="62" y="708" fill="#5ec8f2" font-size="9">T=800ms   云端TTS流到达 → 喇叭播放第一句："（LED亮起）...你回来了啊。"——插入到说话，不到1秒。</text>
+  <rect x="62" y="720" width="1173" height="16" rx="4" fill="#0a0a14"/>
+  <text x="650" y="731" text-anchor="middle" fill="#5ec8f2" font-size="8">身体里没有电池、没有开关、没有USB口。心脏就是身体的唯一电源。有心=有电=活的。没心=断电=死的。</text>
+
+  <line x1="650" y1="743" x2="650" y2="778" stroke="#f0c060" stroke-width="2.5" marker-end="url(#d)"/>
+
+  <!-- 阶段二：对话循环 -->
+  <rect x="30" y="788" width="1240" height="195" rx="14" fill="#1a1a2e" stroke="#7c5ce7" stroke-width="1.5"/>
+  <text x="62" y="816" fill="#7c5ce7" font-size="14" font-weight="bold">阶段二 · 对话循环（每一句话执行一次）</text>
+  <text x="62" y="840" fill="#8888aa" font-size="9">① 用户说话 → I2S双麦拾音 → ESP32压缩 → WiFi上传云端STT</text>
+  <text x="62" y="858" fill="#8888aa" font-size="9">② STT转文字 → heart_id + 用户文字 + 记忆包JSON → 发LLM</text>
+  <text x="62" y="876" fill="#8888aa" font-size="9">③ LLM加载角色System Prompt + 记忆包（亲密值0.77 / 心情0.4 / 关键记忆）</text>
+  <text x="62" y="894" fill="#8888aa" font-size="9">④ LLM返回JSON：{"reply":"哼...累了就早点睡。","memory_update":{"intimacy_delta":+0.02,"mood":0.2,"key_memory":"用户加班很累"}}</text>
+  <text x="62" y="912" fill="#8888aa" font-size="9">⑤ reply文本 → SSML语气标注 → TTS合成音频（微软Azure，角色声线）→ WiFi下发</text>
+  <text x="62" y="930" fill="#8888aa" font-size="9">⑥ ESP32接收音频流 → I2S功放MAX98357A → 喇叭播放</text>
+  <rect x="62" y="942" width="1173" height="30" rx="6" fill="#0a0a14" stroke="#334455" stroke-width="0.4"/>
+  <text x="80" y="962" fill="#557788" font-size="9">⑦ 对话原文追写进心脏Flash分区③（5ms）｜ ⑧ 记忆包快照暂存ESP32内存（拔时一次性写入分区②）｜ ⑨ 云端同步备份</text>
+
+  <line x1="650" y1="983" x2="650" y2="1018" stroke="#f0c060" stroke-width="2.5" marker-end="url(#d)"/>
+
+  <!-- 阶段三：拔出 -->
+  <rect x="30" y="1028" width="1240" height="155" rx="14" fill="#1a1020" stroke="#ff6b8a" stroke-width="1.5"/>
+  <text x="62" y="1056" fill="#ff6b8a" font-size="14" font-weight="bold">阶段三 · 心脏拔出 = 存档 + 死亡（CD#紧急保存）</text>
+  <text x="62" y="1080" fill="#aa8899" font-size="9">T=-100ms  用户抓住心脏往上提 → 磁铁还吸着，手指在用力</text>
+  <text x="62" y="1098" fill="#ff8fab" font-size="9">T=-30ms   CD# 引脚断开！（比VOUT短0.3mm，故意设计成最先断开）→ ESP32中断："紧急保存！"</text>
+  <text x="62" y="1116" fill="#ff8fab" font-size="9">T=-28ms   把ESP32内存中的记忆包快照 → SPI写入心脏Flash分区②（intimacy / mood / key_memories / session_count++）</text>
+  <text x="62" y="1134" fill="#ff8fab" font-size="9">T=-26ms   在分区③末尾写入 "CLEAN_EJECT: 2026-08-05T23:14" 标记正常拔出</text>
+  <text x="62" y="1152" fill="#ff8fab" font-size="9">T=-20ms   保存完成 → ESP32释放SPI总线 → 所有引脚高阻态</text>
+  <text x="62" y="1170" fill="#aa8899" font-size="9">T=0ms     VOUT 断开 → 身体完全断电 → LED灭 → 喇叭静音 → 人偶死去。心脏拿在手里，存着最新记忆。</text>
+
+  <line x1="650" y1="1183" x2="650" y2="1218" stroke="#f0c060" stroke-width="2.5" marker-end="url(#d)"/>
+
+  <!-- 阶段四：独立使用 -->
+  <rect x="30" y="1228" width="1240" height="220" rx="14" fill="#0d1a14" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="62" y="1256" fill="#4ade80" font-size="14" font-weight="bold">阶段四 · 心脏离开身体后（独立设备）</text>
+
+  <rect x="62" y="1270" width="370" height="72" rx="8" fill="#0d1f18" stroke="#4ade80" stroke-width="0.6"/>
+  <text x="247" y="1292" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="bold">🔋 充电</text>
+  <text x="247" y="1310" text-anchor="middle" fill="#446644" font-size="8">心脏侧面自带 USB-C 口 → 直接插线充电</text>
+  <text x="247" y="1326" text-anchor="middle" fill="#446644" font-size="8">跟给 AirPods 充电一样自然。500mAh · 30min充满</text>
+
+  <rect x="450" y="1270" width="370" height="72" rx="8" fill="#0d1f18" stroke="#4ade80" stroke-width="0.6"/>
+  <text x="635" y="1292" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="bold">📖 查看 / 修改</text>
+  <text x="635" y="1310" text-anchor="middle" fill="#446644" font-size="8">心脏插USB-C读卡器 → 插手机 → 小程序直读Flash</text>
+  <text x="635" y="1326" text-anchor="middle" fill="#446644" font-size="8">看历史对话 · 看关系档案 · 改角色设定 · 写回心脏</text>
+
+  <rect x="838" y="1270" width="400" height="72" rx="8" fill="#0d1f18" stroke="#4ade80" stroke-width="0.6"/>
+  <text x="1038" y="1292" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="bold">🎁 送人 / 转移 / 恢复</text>
+  <text x="1038" y="1310" text-anchor="middle" fill="#446644" font-size="8">心脏送朋友 → 插进他的娃娃 → 角色带着全部记忆活过来</text>
+  <text x="1038" y="1326" text-anchor="middle" fill="#446644" font-size="8">心脏损坏 → 空白心脏 + 小程序 → 云端恢复 → 角色复活</text>
+
+  <rect x="62" y="1356" width="1173" height="80" rx="10" fill="#0d0d14" stroke="#f0c060" stroke-width="1"/>
+  <text x="650" y="1380" text-anchor="middle" fill="#f0c060" font-size="11" font-weight="bold">数据策略：心脏是正本，云端是影印本</text>
+  <text x="90" y="1402" fill="#ff6b8a" font-size="9">♥ 心脏 Flash 8MB（正本）: 角色DNA(heart_id+System Prompt+TTS/LED配置) + 记忆包(亲密值/心情/关键回忆) + 最近~2000条对话记录</text>
+  <text x="90" y="1420" fill="#7c5ce7" font-size="9">☁ 云端（影印本·加密备份）: 同上，作为备份。心脏丢失/损坏时，小程序从云端恢复角色。离线对话在心脏重新插入后自动同步回云端。</text>
+  <text x="90" y="1438" fill="#8888aa" font-size="9">冲突规则：如果心脏和云端的数据不一致（比如离线聊了30句心脏比云端新），以心脏为准，心脏覆盖云端。</text>
+
+  <rect x="30" y="1480" width="1240" height="55" rx="10" fill="#1a1618" stroke="#f0c060" stroke-width="1.2"/>
+  <text x="650" y="1503" text-anchor="middle" fill="#f0c060" font-size="11" font-weight="bold">核心架构三原则：① 心脏 = 角色的唯一物理载体（电池 + 数据 + LED 灵魂之光）</text>
+  <text x="650" y="1522" text-anchor="middle" fill="#8888aa" font-size="10">② 身体 = 外骨骼（ESP32 + 麦克风 + 喇叭 + 插槽），无电池无开关无USB，没心脏=死 ｜ ③ 云端 = 安全网，平时不主导，心脏丢了才站出来</text>
+</svg>
+</div>
+
+<a href="ai-bjd-heart.html" class="back-link">← 返回产品说明书</a>
+
+</body>
+</html>
